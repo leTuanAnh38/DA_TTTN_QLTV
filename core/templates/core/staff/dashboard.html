@@ -1,0 +1,165 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Bảng điều khiển - Admin Alovu{% endblock %}
+
+{% block staff_title %}Bảng điều khiển Quản trị{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="mb-5 animate__animated animate__fadeInDown">
+        <h3 class="fw-bold text-dark m-0">Bảng điều khiển quản trị</h3>
+        <p class="text-muted small m-0 mt-1">Chào buổi làm việc, hệ thống đang vận hành ổn định.</p>
+    </div>
+
+            <div class="row g-4 mb-5">
+                <!-- Tổng sách -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeInUp" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.2);">
+                                    <i class="fas fa-book fs-4 text-white"></i>
+                                </div>
+                                <span class="badge rounded-pill small px-3" style="background: rgba(255, 255, 255, 0.2); color: white;">Tổng kho</span>
+                            </div>
+                            <h2 class="mb-0 fw-bold text-white">{{ total_library_books }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 small fw-medium mt-1">Sách trong thư viện</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sách sẵn sàng -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeInUp" style="background: linear-gradient(135deg, #2af598 0%, #009efd 100%);">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.2);">
+                                    <i class="fas fa-check-circle fs-4 text-white"></i>
+                                </div>
+                                <span class="badge rounded-pill small px-3" style="background: rgba(255, 255, 255, 0.2); color: white;">Khả dụng</span>
+                            </div>
+                            <h2 class="mb-0 fw-bold text-white">{{ current_available_books }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 small fw-medium mt-1">Sách đang trên kệ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chờ duyệt -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeInUp" style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.2);">
+                                    <i class="fas fa-clock fs-4 text-white"></i>
+                                </div>
+                                <a href="{% url 'staff_borrow_management' %}" class="badge bg-white text-dark rounded-pill small px-3 text-decoration-none fw-bold shadow-sm">Xử lý ngay</a>
+                            </div>
+                            <h2 class="mb-0 fw-bold text-white">{{ pending_transactions.count|default:0 }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 small fw-medium mt-1">Đơn đang chờ duyệt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quá hạn -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeInUp" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: rgba(255, 255, 255, 0.2);">
+                                    <i class="fas fa-exclamation-triangle fs-4 text-white"></i>
+                                </div>
+                                <span class="badge rounded-pill small px-3" style="background: rgba(255, 255, 255, 0.2); color: white;">Cảnh báo</span>
+                            </div>
+                            <h2 class="mb-0 fw-bold text-white">{{ overdue_transactions.count|default:0 }}</h2>
+                            <p class="mb-0 text-white text-opacity-75 small fw-medium mt-1">Đơn mượn quá hạn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BIỂU ĐỒ -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white animate__animated animate__fadeInLeft">
+                        <div class="card-header bg-white border-0 p-4 pb-0">
+                            <h5 class="fw-bold m-0 text-dark">
+                                <i class="fas fa-chart-pie text-primary me-2"></i> Trạng thái mượn sách
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div style="height: 300px; position: relative;">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white animate__animated animate__fadeInRight">
+                        <div class="card-header bg-white border-0 p-4 pb-0">
+                            <h5 class="fw-bold m-0 text-dark">
+                                <i class="fas fa-fire text-danger me-2"></i> Sách mượn nhiều nhất
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div style="height: 300px; position: relative;">
+                                <canvas id="topBooksChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if overdue_transactions %}
+            <div class="bg-white rounded-4 shadow-sm border-0 mb-5 overflow-hidden animate__animated animate__fadeInUp">
+                <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold m-0 text-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i> Mượn quá hạn cần xử lý
+                    </h5>
+                    <a href="{% url 'staff_borrow_management' %}" class="btn btn-sm btn-light border rounded-pill px-3 fw-bold">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="text-muted small text-uppercase py-3 ps-4 fw-bold">Sinh viên</th>
+                                <th class="text-muted small text-uppercase py-3 fw-bold">MSSV</th>
+                                <th class="text-muted small text-uppercase py-3 fw-bold">Tài liệu</th>
+                                <th class="text-muted small text-uppercase py-3 fw-bold">Hạn trả</th>
+                                <th class="text-muted small text-uppercase py-3 text-end pe-4 fw-bold">Hồ sơ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in overdue_transactions %}
+                            <tr class="animate__animated animate__fadeIn">
+                                <td class="ps-4 py-3">
+                                    <div class="fw-bold text-dark">{{ item.user.get_full_name|default:item.user.username }}</div>
+                                </td>
+                                <td class="text-muted small font-monospace">{{ item.user.msv }}</td>
+                                <td>
+                                    <div class="text-dark fw-medium text-truncate" style="max-width: 250px;">{{ item.book.title }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-2 fw-bold" style="color: #dc3545; background-color: rgba(220, 53, 69, 0.1);">{{ item.due_date|date:"d/m/Y" }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'staff_user_detail' item.user.id %}" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; line-height: 30px;">
+                                        <i class="fas fa-user"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+            
+</div>
+
+<!-- Biểu đồ Dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/admin_chart.js' %}?v=2"></script>
+{% endblock %}

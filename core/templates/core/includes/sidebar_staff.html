@@ -1,0 +1,75 @@
+<!-- core/templates/core/includes/sidebar_staff.html -->
+{% load static %}
+
+<aside class="staff-sidebar shadow-lg">
+    <div class="staff-sidebar-logo">
+        <i class="fas fa-book-reader fa-2x text-warning me-2"></i>
+        <h5 class="mb-0">Thư viện ALOVU</h5>
+    </div>
+
+    <div class="staff-sidebar-nav">
+        <a href="{% url 'staff_dashboard' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+            <i class="fas fa-chart-line"></i>
+            <span>Tổng quan</span>
+        </a>
+
+        <a href="{% url 'staff_book_list' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_book_list' or request.resolver_match.url_name == 'add_book' or request.resolver_match.url_name == 'edit_book' %}active{% endif %}">
+            <i class="fas fa-book"></i>
+            <span>Quản lý Sách</span>
+        </a>
+
+        <a href="{% url 'staff_borrow_management' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_borrow_management' %}active{% endif %}">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Mượn & Trả</span>
+        </a>
+
+        <a href="{% url 'staff_user_management' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_user_management' or request.resolver_match.url_name == 'staff_user_detail' %}active{% endif %}">
+            <i class="fas fa-users"></i>
+            <span>Người dùng</span>
+        </a>
+
+        <a href="{% url 'staff_event_list' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_event_list' or request.resolver_match.url_name == 'event_create' or request.resolver_match.url_name == 'event_edit' or request.resolver_match.url_name == 'event_delete' %}active{% endif %}">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Sự kiện</span>
+        </a>
+
+        <a href="{% url 'staff_review_management' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_review_management' %}active{% endif %}">
+            <i class="fas fa-star"></i>
+            <span>Đánh giá</span>
+        </a>
+
+        <a href="{% url 'staff_penalty_management' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_penalty_management' %}active{% endif %}">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Xử phạt</span>
+        </a>
+
+        <hr class="mx-3 opacity-25">
+
+        <a href="{% url 'staff_category_list' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_category_list' or request.resolver_match.url_name == 'staff_category_add' or request.resolver_match.url_name == 'staff_category_edit' %}active{% endif %}">
+            <i class="fas fa-tags"></i>
+            <span>Danh mục</span>
+        </a>
+
+        <a href="{% url 'staff_publisher_list' %}"
+            class="staff-nav-link {% if request.resolver_match.url_name == 'staff_publisher_list' or request.resolver_match.url_name == 'staff_publisher_add' or request.resolver_match.url_name == 'staff_publisher_edit' %}active{% endif %}">
+            <i class="fas fa-building"></i>
+            <span>Nhà xuất bản</span>
+        </a>
+    </div>
+
+    <div class="staff-sidebar-footer">
+        <a href="{% url 'logout' %}" class="staff-nav-link text-warning custom-confirm"
+            data-message="Bạn có chắc chắn muốn đăng xuất không?">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Đăng xuất</span>
+        </a>
+    </div>
+</aside>
