@@ -1,0 +1,65 @@
+<div class="list-group list-group-flush shadow-sm">
+    
+    {% if False %}
+        <!-- Hidden management section in user sidebar as it's now in the dedicated staff dashboard -->
+    {% endif %}
+
+    <div class="card-header bg-primary py-3 text-white fw-bold text-uppercase border-0">
+        <i class="fas fa-th-large me-2 fa-fw"></i>Liên kết nhanh
+    </div>
+
+    <a href="{% url 'home' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'home' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-home text-primary me-3 fa-fw"></i>Trang chủ
+    </a>
+
+    <a href="{% url 'notification_list' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'notification_list' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-bell text-primary me-3 fa-fw"></i>Thông báo 
+       <span id="unread-count-sidebar" class="badge bg-danger rounded-pill float-end" 
+        {% if not unread_notifications_count %}style="display: none;"{% endif %}>
+        {{ unread_notifications_count }}
+    </span>
+    </a>
+    
+    <a href="{% url 'view_cart' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'view_cart' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-shopping-cart text-primary me-3 fa-fw"></i>Giỏ sách
+        <span class="badge bg-danger rounded-pill float-end" id="cart-badge" {% if not global_cart_count %}style="display: none;"{% endif %}>
+            {{ global_cart_count }}
+        </span>
+    </a>
+    
+    <a href="{% url 'book_list' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'book_list' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-book-reader text-primary me-3 fa-fw"></i>Kho sách
+    </a>
+
+    <a href="{% url 'borrow_history' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'borrow_history' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-history text-primary me-3 fa-fw"></i>Lịch sử mượn
+    </a>
+
+    <a href="{% url 'wishlist' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'wishlist' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-heart text-danger me-3 fa-fw"></i>Yêu thích
+        {% if wishlist_count > 0 %}
+            <span class="badge bg-danger rounded-pill float-end">{{ wishlist_count }}</span>
+        {% endif %}
+    </a>
+</div>
+
+<style>
+    /* Chỉ giữ lại style cho nội dung */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.4em 0.6em;
+    }
+    .list-group-item {
+        transition: all 0.2s ease;
+        border-radius: 0 !important;
+    }
+    .list-group-item:hover {
+        padding-left: 1.5rem !important;
+        background-color: #f8f9fa;
+    }
+    .list-group-item.active {
+        background-color: #f0f7ff !important;
+        color: #0d6efd !important;
+        border-left: 4px solid #0d6efd !important;
+    }
+</style>

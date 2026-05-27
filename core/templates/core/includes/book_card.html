@@ -1,0 +1,207 @@
+{% load static %}
+
+<div
+    class="col-md-6 col-lg-4 d-flex align-items-stretch animate__animated animate__fadeInUp {% if is_wishlist_page %}wishlist-card-item{% endif %}">
+    <div
+        class="bg-white border-0 shadow-sm rounded-4 w-100 d-flex flex-column overflow-hidden position-relative transition-hover">
+
+        {% if book.price and book.price > 0 %}
+        <div class="position-absolute bg-danger text-white px-3 py-1 fw-bold small"
+            style="top: 15px; left: 0; border-radius: 0 20px 20px 0; z-index: 2; box-shadow: 2px 2px 10px rgba(220, 53, 69, 0.3);">
+            {{ book.price|floatformat:0 }} VNĐ
+        </div>
+        {% endif %}
+
+        <div class="text-center bg-light" style="height: 260px; overflow: hidden;">
+            <a href="{% url 'book_detail' book.id %}" class="d-block h-100">
+                <img src="{{ book.get_cover }}" class="h-100 w-100 transition-zoom"
+                    style="object-fit: cover; object-position: top;" alt="{{ book.title }}">
+            </a>
+        </div>
+
+        <div class="p-4 text-center d-flex flex-column flex-grow-1">
+            <h6 class="fw-bold text-dark text-truncate-2 mb-2" style="min-height: 44px;">
+                <a href="{% url 'book_detail' book.id %}" class="text-dark text-decoration-none hover-primary">{{ book.title }}</a>
+            </h6>
+
+            <div class="small text-muted mb-3">
+                <div class="mb-1"><i class="far fa-user me-1"></i> {{ book.author|default:"Chưa rõ" }}</div>
+                {% if book.category %}
+                <span class="badge bg-light text-secondary border-0 px-2 py-1">{{ book.category.name }}</span>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4 mt-auto p-2 bg-light rounded-3">
+                <div class="small text-muted">Còn lại: <strong class="text-dark">{{ book.quantity }}</strong></div>
+                <div class="small">
+                    {% if book.quantity > 0 %}
+                    <span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Có sẵn</span>
+                    {% else %}
+                    <span class="text-danger fw-bold"><i class="fas fa-times-circle me-1"></i>Hết sách</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="w-100 d-flex justify-content-center">
+                {% if book.id in pending_book_ids %}
+                <button class="btn btn-warning text-dark rounded-pill fw-bold px-4 py-2 shadow-none disabled"
+                    style="opacity: 0.8;">
+                    <i class="fas fa-clock me-1"></i>Chờ duyệt
+                </button>
+                {% elif book.id in overdue_book_ids %}
+                <button class="btn btn-danger text-white rounded-pill fw-bold px-4 py-2 disabled shadow-none">
+                    <i class="fas fa-exclamation-circle me-1"></i>Quá hạn
+                </button>
+                {% elif book.id in borrowed_book_ids %}
+                <button class="btn btn-secondary rounded-pill fw-bold px-4 py-2 disabled shadow-none">
+                    <i class="fas fa-book-reader me-1"></i>Đang mượn
+                </button>
+                {% elif book.quantity > 0 %}
+                <div class="w-100 d-flex gap-2">
+                    <button type="button"
+                        class="btn btn-outline-primary fw-bold rounded-pill shadow-sm py-2 btn-add-to-cart transition-hover w-50"
+                        data-url="{% url 'api_add_to_cart' book.id %}" title="Thêm vào giỏ sách">
+                        <i class="fas fa-cart-plus"></i> Giỏ
+                    </button>
+                    <button type="button"
+                        class="btn btn-primary fw-bold rounded-pill text-white shadow-sm py-2 transition-hover w-50"
+                        data-bs-toggle="modal" data-bs-target="#borrowModal{{ book.id }}" title="Mượn sách này ngay">
+                        Mượn ngay
+                    </button>
+                </div>
+                {% else %}
+                <button class="btn btn-light border rounded-pill fw-bold w-100 py-2 disabled text-muted">
+                    <i class="fas fa-times-circle me-1"></i>TẠM HẾT
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="mt-3">
+                <button type="button"
+                    class="btn btn-link btn-sm p-0 text-decoration-none text-muted btn-toggle-wishlist"
+                    data-url="{% url 'api_toggle_wishlist' book.id %}" data-book-id="{{ book.id }}">
+                    <i
+                        class="{% if book.id in wishlist_book_ids or is_wishlist_page %}fas text-danger{% else %}far{% endif %} fa-heart fs-5 heart-icon-{{ book.id }}"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade borrow-modal" id="borrowModal{{ book.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-5 overflow-hidden">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fas fa-calendar-alt text-primary me-2"></i>Lịch hẹn lấy sách
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="{% url 'borrow_book' book.id %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-4 text-center">
+                        <img src="{{ book.get_cover }}" class="rounded-3 shadow-sm mb-3 border"
+                            style="width: 80px; height: 110px; object-fit: cover;">
+                        <h6 class="fw-bold text-dark">{{ book.title }}</h6>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-2"><i class="far fa-calendar-alt me-2 text-primary"></i>1. Chọn ngày đến quầy</label>
+                        <div class="input-group shadow-sm rounded-3 transition-hover">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="far fa-calendar-check text-primary"></i></span>
+                            <input type="date" name="pickup_date" class="form-control border-start-0 bg-light rounded-end-3 py-2 px-3 fw-medium" min="{% now 'Y-m-d' %}" required style="box-shadow: none;">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-2"><i class="far fa-clock me-2 text-primary"></i>2. Chọn buổi (Ca trực)</label>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="pickup_shift" id="shiftSang{{ book.id }}" value="SANG" required>
+                                <label class="w-100 py-3 rounded-4 cart-radio-card d-flex flex-column align-items-center shadow-sm" for="shiftSang{{ book.id }}">
+                                    <i class="fas fa-sun mb-2 fs-4 text-warning shift-icon"></i>
+                                    <span class="fw-bold text-dark">Ca Sáng</span>
+                                    <small class="text-muted" style="font-size: 0.75rem;">07:30 - 11:30</small>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="pickup_shift" id="shiftChieu{{ book.id }}" value="CHIEU" required>
+                                <label class="w-100 py-3 rounded-4 cart-radio-card d-flex flex-column align-items-center shadow-sm" for="shiftChieu{{ book.id }}">
+                                    <i class="fas fa-cloud-sun mb-2 fs-4 text-info shift-icon"></i>
+                                    <span class="fw-bold text-dark">Ca Chiều</span>
+                                    <small class="text-muted" style="font-size: 0.75rem;">13:00 - 17:00</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="alert alert-warning border border-warning rounded-4 small mb-0 d-flex align-items-center bg-white text-dark shadow-sm">
+                        <i class="fas fa-info-circle me-3 fs-5 text-warning"></i>
+                        <span>Đơn sẽ <b>tự động hủy</b> nếu bạn không đến đúng ngày & ca đã chọn.</span>
+                    </div>
+
+                    {% if book.price and book.price > 0 %}
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fw-bold text-dark">Phí dịch vụ:</span>
+                            <span class="h5 fw-bold text-danger mb-0">{{ book.price|floatformat:0 }} VNĐ</span>
+                        </div>
+
+                        <div class="payment-methods row g-3">
+                            <div class="col-12">
+                                <input class="btn-check" type="radio" name="payment_method" id="payCash{{ book.id }}" value="CASH" checked onchange="document.getElementById('qrCodeSection{{ book.id }}').style.display='none'">
+                                <label class="w-100 text-start p-3 rounded-4 cart-radio-card shadow-sm d-flex align-items-center" for="payCash{{ book.id }}">
+                                    <div class="p-2 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background-color: rgba(25, 135, 84, 0.1);">
+                                        <i class="fas fa-wallet text-success fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">Tiền mặt tại quầy</div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">Thanh toán khi nhận sách</div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-12">
+                                <input class="btn-check" type="radio" name="payment_method" id="payBank{{ book.id }}" value="BANK" onchange="document.getElementById('qrCodeSection{{ book.id }}').style.display='block'">
+                                <label class="w-100 text-start p-3 rounded-4 cart-radio-card shadow-sm d-flex align-items-center" for="payBank{{ book.id }}">
+                                    <div class="p-2 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background-color: rgba(13, 110, 253, 0.1);">
+                                        <i class="fas fa-qrcode text-primary fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">Chuyển khoản QR</div>
+                                        <div class="small text-muted" style="font-size: 0.75rem;">Quét mã thanh toán nhanh chóng</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="qrCodeSection{{ book.id }}" class="mt-3 animate__animated animate__fadeIn"
+                            style="display: none;">
+                            <div class="p-3 bg-light border border-primary rounded-3 text-center shadow-sm">
+                                <p class="fw-bold text-dark mb-2">Quét mã MoMo/Ngân hàng</p>
+                                <img src="{% static 'img/qr.png' %}" alt="Mã QR Thanh Toán"
+                                    class="img-fluid rounded border mb-2" style="max-width: 140px;">
+                                <div class="small text-dark mt-2 bg-white p-2 rounded border border-dashed">
+                                    Nội dung chuyển khoản:<br>
+                                    <strong class="text-danger fs-6">Sách {{ book.id }} - {{ request.user.msv }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="payment_method" value="FREE">
+                    {% endif %}
+                </div>
+
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="submit"
+                        class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg transition-hover">
+                        XÁC NHẬN ĐĂNG KÝ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
