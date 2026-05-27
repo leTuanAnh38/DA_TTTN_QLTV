@@ -1,0 +1,118 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Quản lý thư viện{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">{{ title }}</h2>
+                    <p class="text-muted small mb-0"><i class="fas fa-info-circle me-1"></i> Thông tin được cập nhật sẽ hiển thị ngay lập tức trên hệ thống.</p>
+                </div>
+                <a href="{% url 'staff_book_list' %}?page={{ current_page|default:'1' }}" class="btn btn-outline-secondary rounded-pill px-4 btn-sm fw-medium shadow-none">
+                    <i class="fas fa-undo-alt me-2"></i>Hủy thao tác
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden bg-white">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <form id="book-edit-form" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row g-5">
+                            <div class="col-lg-4 border-end">
+                                <div class="sticky-top" style="top: 100px; z-index: 1;">
+                                    <div class="text-center mb-4" id="drag-drop-area" style="cursor: pointer;">
+                                        <div class="position-relative d-inline-block">
+                                            <div class="preview-frame p-2 bg-light rounded-4 shadow-sm border border-dashed transition-hover">
+                                                <img id="avatar-preview" 
+                                                     src="{% if form.instance.cover_file %}{{ form.instance.cover_file.url }}{% elif form.instance.cover_image %}{{ form.instance.cover_image }}{% else %}https://placehold.co/240x340/f8f9fa/6c757d?text=Chua+co+anh{% endif %}" 
+                                                     class="rounded-3" 
+                                                     style="width: 220px; height: 320px; object-fit: cover;" 
+                                                     alt="Bìa sách">
+                                            </div>
+                                            <label for="cover-file-upload" class="position-absolute bottom-0 end-0 btn btn-primary btn-lg rounded-circle shadow-lg border-white border-3" style="transform: translate(20%, 20%); cursor: pointer; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                            </label>
+                                        </div>
+                                        <div class="mt-3 text-muted small">
+                                            <i class="fas fa-mouse-pointer me-1"></i> Kéo thả ảnh vào đây để tải lên
+                                        </div>
+                                    </div>
+                                    <div class="upload-options">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-dark small">Tải ảnh lên từ máy tính</label>
+                                            <input type="file" id="cover-file-upload" name="cover_file" class="form-control form-control-sm rounded-3 shadow-none border" accept="image/*">
+                                        </div>
+                                        <div class="position-relative py-3">
+                                            <hr class="m-0">
+                                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small fw-bold">HOẶC</span>
+                                        </div>
+                                        <div>
+                                            <label class="form-label fw-bold text-dark small">Sử dụng liên kết ảnh (URL)</label>
+                                            <input type="text" id="cover-url-input" name="cover_image" class="form-control form-control-sm rounded-3 shadow-none border" placeholder="Dán link ảnh tại đây..." value="{{ form.instance.cover_image|default:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-8">
+                                <h5 class="fw-bold text-primary mb-4 pb-2 border-bottom"><i class="fas fa-edit me-2"></i>Thông tin cơ bản</h5>
+                                
+                                <div class="row g-4">
+                                    {% for field in form %}
+                                        {% if field.name != 'cover_image' and field.name != 'cover_file' and field.name != 'location' %}
+                                            
+                                            {% if field.name == 'floor' or field.name == 'shelf' or field.name == 'area' %}
+                                                <div class="col-md-4">
+                                                    <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                        {{ field.label }}
+                                                    </label>
+                                                    {{ field }}
+                                                    {% if field.errors %}
+                                                        <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <div class="{% if field.name == 'description' %}col-12{% else %}col-md-6{% endif %}">
+                                                    <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                        {{ field.label }} {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                                    </label>
+                                                    {{ field }}
+                                                    {% if field.errors %}
+                                                        <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+
+                                        {% elif field.name == 'location' %}
+                                            <div style="display: none;">{{ field }}</div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mt-5 pt-4 border-top">
+                                    <div class="d-flex gap-3">
+                                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm d-flex align-items-center">
+                                            <i class="fas fa-check-circle me-2"></i> Hoàn tất & Lưu lại
+                                        </button>
+                                        <button type="reset" class="btn btn-link text-decoration-none text-muted fw-bold">Đặt lại</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
