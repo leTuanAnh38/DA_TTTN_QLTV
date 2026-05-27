@@ -1,0 +1,170 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Trang chủ - Thư viện Alovu{% endblock %}
+{% block nav_home %}active fw-bold{% endblock %}
+
+{% block content %}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+<div class="featured-slider-wrapper mt-4 mb-5">
+    <div class="container-fluid px-lg-5">
+        <div class="header-carousel owl-carousel shadow-sm rounded-4 overflow-hidden border">
+            <div class="slider-item">
+                <img src="{% static 'img/banner1.png' %}" alt="Kỹ năng cuộc sống" class="w-100"
+                    style="max-height: 450px; object-fit: cover;">
+            </div>
+            <div class="slider-item">
+                <img src="{% static 'img/banner2.png' %}" alt="10.000 cuốn sách PDF Miễn Phí" class="w-100"
+                    style="max-height: 450px; object-fit: cover;">
+            </div>
+            <div class="slider-item">
+                <img src="{% static 'img/banner3.png' %}" alt="Thư viện số" class="w-100"
+                    style="max-height: 450px; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="sticky-sidebar">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+
+            <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                <h3 class="text-primary text-center fw-bold mb-4 border-bottom pb-3">DANH SÁCH SÁCH MỚI TINH KHÔI</h3>
+
+                <div class="row g-4">
+                    {% for book in books %}
+                    {% if not book.price or book.price == 0 %}
+
+                    {% include 'core/includes/book_card.html' %}
+
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="text-end mt-4 pt-3 border-top">
+                    <a href="{% url 'book_list' %}" class="btn btn-link text-primary fw-bold text-decoration-none p-0">
+                        XEM TIẾP KHO SÁCH <i class="fas fa-chevron-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                <h3 class="text-danger text-center fw-bold mb-4 border-bottom pb-3"><i
+                        class="fas fa-crown text-warning me-2"></i>Sách phiên bản giới hạn có phí</h3>
+
+                <div class="row g-4">
+                    {% for book in books %}
+                    {% if book.price and book.price > 0 %}
+
+                    {% include 'core/includes/book_card.html' %}
+
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="text-end mt-4 pt-3 border-top">
+                    <a href="{% url 'premium_books' %}"
+                        class="btn btn-link text-danger fw-bold text-decoration-none p-0">
+                        xem tất cả sách <i class="fas fa-chevron-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="bg-white p-4 rounded-4 shadow-sm border h-100">
+                        <h5 class="fw-bold text-warning mb-4 border-start border-4 border-warning ps-3">Đang Mượn Nhiều
+                            Nhất</h5>
+                        <div class="row g-3">
+                            {% for book in popular_books %}
+                            <div class="col-sm-4 col-6">
+                                <div
+                                    class="bg-light rounded p-2 text-center border h-100 d-flex flex-column transition-hover position-relative">
+                                    {% if book.price and book.price > 0 %}
+                                    <span class="position-absolute badge bg-danger text-white"
+                                        style="top: -5px; right: -5px; z-index: 2;">VIP</span>
+                                    {% endif %}
+                                    <a href="{% url 'book_detail' book.id %}">
+                                        <img src="{{ book.get_cover }}" class="img-fluid rounded mb-2"
+                                            style="height: 120px; object-fit: contain;">
+                                    </a>
+                                    <h6 class="small fw-bold text-dark text-truncate mb-1" title="{{ book.title }}">{{ book.title }}</h6>
+                                    <span class="badge bg-warning text-dark mt-auto mx-auto"><i
+                                            class="fas fa-fire text-danger me-1"></i>{{ book.borrow_count }} lượt</span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted small">Chưa có dữ liệu mượn sách.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="bg-white p-4 rounded-4 shadow-sm border h-100">
+                        <h5 class="fw-bold text-success mb-4 border-start border-4 border-success ps-3">Đánh Giá Cao (4
+                            Sao+)</h5>
+                        <div class="row g-3">
+                            {% for book in top_rated_books %}
+                            <div class="col-sm-4 col-6">
+                                <div
+                                    class="bg-light rounded p-2 text-center border h-100 d-flex flex-column transition-hover position-relative">
+                                    {% if book.price and book.price > 0 %}
+                                    <span class="position-absolute badge bg-danger text-white"
+                                        style="top: -5px; right: -5px; z-index: 2;">VIP</span>
+                                    {% endif %}
+                                    <a href="{% url 'book_detail' book.id %}">
+                                        <img src="{{ book.get_cover }}" class="img-fluid rounded mb-2"
+                                            style="height: 120px; object-fit: contain;">
+                                    </a>
+                                    <h6 class="small fw-bold text-dark text-truncate mb-1" title="{{ book.title }}">{{ book.title }}</h6>
+                                    <span class="text-warning small mt-auto fw-bold">
+                                        <i class="fas fa-star me-1"></i>{{ book.avg_rating|floatformat:1 }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted small">Chưa có đủ đánh giá.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                <h5 class="fw-bold text-primary mb-4 border-start border-4 border-primary ps-3">Đề xuất cho bạn</h5>
+                <div class="row g-3">
+                    {% for book in recommended_books|slice:":3" %}
+                    <div class="col-md-4">
+                        <div
+                            class="bg-light rounded p-3 text-center border h-100 d-flex flex-column transition-hover position-relative">
+                            {% if book.price and book.price > 0 %}
+                            <span class="position-absolute badge bg-danger text-white"
+                                style="top: -5px; right: -5px; z-index: 2;">VIP</span>
+                            {% endif %}
+                            <a href="{% url 'book_detail' book.id %}">
+                                <img src="{{ book.get_cover }}" class="img-fluid rounded mb-2"
+                                    style="height: 160px; object-fit: contain;">
+                            </a>
+                            <h6 class="fw-bold text-dark text-truncate mb-0">{{ book.title }}</h6>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

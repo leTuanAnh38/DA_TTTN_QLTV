@@ -1,0 +1,117 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Đăng nhập - Thư viện Alovu{% endblock %}
+
+{% block content %}
+
+
+<div class="container-fluid p-0 animate__animated animate__fadeIn">
+    <div class="row g-0 min-vh-100">
+
+        <div
+            class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center position-relative overflow-hidden bg-auth-image">
+
+            <div class="text-center text-white p-5 position-relative" style="z-index: 2; max-width: 600px;">
+                <i class="fas fa-book-reader fa-5x text-primary mb-4 animate__animated animate__bounceInDown"></i>
+                <h1 class="display-3 fw-bold mb-4"
+                    style="text-shadow: 2px 4px 10px rgba(0,0,0,0.8); color: #ffffff !important;">Thư viện ALOVU</h1>
+
+                <p class="lead fst-italic opacity-90 mb-4">"Sách là kho tàng tri thức quý giá nhất của nhân loại."</p>
+
+                <div class="divider bg-primary mx-auto mb-4" style="height: 3px; width: 60px;"></div>
+
+                <p class="mb-4 opacity-75 lh-lg">
+                    Chào mừng bạn đến với hệ thống quản lý thư viện hiện đại.
+                    Khám phá hàng ngàn đầu sách từ giáo trình học thuật, tài liệu nghiên cứu đến văn học giải trí.
+                    Chúng tôi mang đến trải nghiệm mượn trả thông minh, nhanh chóng và tiện lợi nhất cho cộng đồng sinh
+                    viên.
+                </p>
+
+                <div class="row g-3 text-start mb-5 opacity-90">
+                    <div class="col-6">
+                        <i class="fas fa-check-circle text-primary me-2"></i> Mượn sách trực tuyến
+                    </div>
+                    <div class="col-6">
+                        <i class="fas fa-check-circle text-primary me-2"></i> Gia hạn dễ dàng
+                    </div>
+                    <div class="col-6">
+                        <i class="fas fa-check-circle text-primary me-2"></i> Nhắc lịch trả tự động
+                    </div>
+                    <div class="col-6">
+                        <i class="fas fa-check-circle text-primary me-2"></i> Tích điểm thưởng
+                    </div>
+                </div>
+
+                <div class="mt-5 text-primary opacity-50">
+                    <i class="fas fa-star me-1"></i>
+                    <i class="fas fa-star me-1"></i>
+                    <i class="fas fa-star me-1"></i>
+                    <i class="fas fa-star me-1"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+
+            <div class="position-absolute bottom-0 start-0 p-3 opacity-10">
+                <i class="fas fa-graduation-cap fa-10x text-white"></i>
+            </div>
+        </div>
+
+        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-white">
+            <div class="p-5 w-100" style="max-width: 500px;">
+
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold text-dark">Chào mừng trở lại!</h2>
+                    <p class="text-muted">Vui lòng đăng nhập để tiếp tục khám phá kho sách.</p>
+                </div>
+
+
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-floating mb-4 position-relative">
+                        <input type="text" name="username"
+                            class="form-control rounded-pill border-secondary-subtle ps-4" id="floatingUsername"
+                            placeholder="Tên đăng nhập" required>
+                        <label for="floatingUsername" class="text-muted">Tên đăng nhập hoặc Email</label>
+                        <i
+                            class="fas fa-user position-absolute top-50 end-0 translate-middle-y me-4 text-secondary opacity-50"></i>
+                    </div>
+
+                    <div class="form-floating mb-4 position-relative">
+                        <input type="password" name="password"
+                            class="form-control rounded-pill border-secondary-subtle ps-4" id="floatingPassword"
+                            placeholder="Mật khẩu" required>
+                        <label for="floatingPassword" class="text-muted">Mật khẩu</label>
+                        <i
+                            class="fas fa-lock position-absolute top-50 end-0 translate-middle-y me-4 text-secondary opacity-50"></i>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 small px-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                            <label class="form-check-input-label text-muted" for="rememberMe">Nhớ mật khẩu</label>
+                        </div>
+                        <a href="#" class="text-primary text-decoration-none">Quên mật khẩu?</a>
+                    </div>
+
+                    <button type="submit"
+                        class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm animate__animated animate__pulse animate__infinite"
+                        style="animation-duration: 2s;">
+                        <i class="fas fa-sign-in-alt me-2"></i>ĐĂNG NHẬP NGAY
+                    </button>
+                </form>
+
+                <div class="text-center mt-5 pt-4 border-top">
+                    <p class="text-muted">Bạn chưa có tài khoản?</p>
+                    <a href="{% url 'register' %}" class="btn btn-outline-dark rounded-pill px-5">
+                        <i class="fas fa-user-plus me-2"></i>ĐĂNG KÝ THÀNH VIÊN
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

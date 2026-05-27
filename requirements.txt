@@ -9,4 +9,4 @@ python-dotenv==1.2.2
 google-genai==1.75.0
 requests==2.33.1
 PyMySQL==1.1.2
-pycryptodome==3.21.1
+pycryptodome==3.21.0
