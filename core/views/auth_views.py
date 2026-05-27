@@ -43,4 +43,44 @@ def get_user_redirect_url(user):
         return 'staff_dashboard'
     return 'home'
 
+def user_login(request):
+    # 1. Nếu đã đăng nhập, chuyển hướng ngay theo vai trò
+    if request.user.is_authenticated:
+        return redirect(get_user_redirect_url(request.user))
 
+    # 2. Xử lý khi nhấn nút Đăng nhập (POST)
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user() # AuthenticationForm đã authenticate rồi, chỉ cần lấy user ra
+            login(request, user) 
+            
+            # Xử lý tham số 'next' để quay lại trang cũ nếu có (Tránh Open Redirect)
+            next_url = request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
+                
+            # Nếu không có 'next' hoặc 'next' không an toàn, về dashboard mặc định
+            return redirect(get_user_redirect_url(user))
+        else:
+            messages.error(request, 'Tên đăng nhập hoặc mật khẩu không đúng.')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'core/auth/login.html', {'form': form})
+
+@login_required(login_url='login') 
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():  
+            user = form.save()
+            update_session_auth_hash(request, user) 
+            messages.success(request, 'Mật khẩu của bạn đã được cập nhật thành công!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại thông tin bên dưới.')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'core/auth/change_password.html', {'form': form})
