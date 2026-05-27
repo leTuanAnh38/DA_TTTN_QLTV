@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Thư viện Alovu{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}?v=4.2" rel="stylesheet">
+    {% if user.is_staff or user.role == 'STAFF' or user.is_superuser %}
+    <link href="{% static 'css/staff_layout.css' %}?v=1.0" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% endif %}
+
+</head>
+
+<body
+    class="{% if user.is_staff and '/staff/' in request.path or user.is_staff and '/profile/' in request.path or user.is_staff and '/change-password/' in request.path or user.role == 'STAFF' and '/staff/' in request.path or user.role == 'STAFF' and '/profile/' in request.path or user.role == 'STAFF' and '/change-password/' in request.path %}staff-mode{% endif %}">
+
+    {% if user.is_staff and '/staff/' in request.path or user.is_staff and '/profile/' in request.path or user.is_staff and '/change-password/' in request.path or user.role == 'STAFF' and '/staff/' in request.path or user.role == 'STAFF' and '/profile/' in request.path or user.role == 'STAFF' and '/change-password/' in request.path %}
+    <!-- STAFF LAYOUT START -->
+    <div class="staff-wrapper">
+        {% include 'core/includes/sidebar_staff.html' %}
+
+        <div class="staff-content-wrapper">
+            <header class="staff-top-header">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-light d-lg-none me-3" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#staffSidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="d-lg-none">
+                        <i class="fas fa-book-reader text-warning me-2"></i>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle d-flex align-items-center text-decoration-none"
+                        data-bs-toggle="dropdown" data-bs-display="static">
+                        <div class="text-end d-none d-md-block me-2">
+                            <div class="fw-bold small text-dark">{{ user.get_full_name|default:user.username }}</div>
+                            <div class="text-muted small" style="font-size: 0.7rem;">{{ user.role }}</div>
+                        </div>
+                        {% if user.avatar and 'default.png' not in user.avatar.name %}
+                        <img src="{{ user.avatar.url }}" class="rounded-circle border"
+                            style="width: 40px; height: 40px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                            style="width: 40px; height: 40px;">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        {% endif %}
+                    </a>
+                    <ul
+                        class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2 animate__animated animate__fadeIn">
+                        <li><a class="dropdown-item py-2" href="{% url 'profile' %}"><i
+                                    class="fas fa-user-edit me-2"></i>Hồ sơ</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item py-2 text-danger fw-bold custom-confirm" href="{% url 'logout' %}"
+                                data-message="Đăng xuất khỏi hệ thống?"><i class="fas fa-sign-out-alt me-2"></i>Đăng
+                                xuất</a></li>
+                    </ul>
+                </div>
+            </header>
+
+
+
+            {% else %}
+            <!-- USER LAYOUT START -->
+            <header class="sticky-top shadow-sm header-user">
+                <div class="container-fluid px-lg-5 py-2 d-none d-lg-block border-bottom bg-white">
+                    <div class="row gx-0 align-items-center justify-content-between">
+                        <div class="col-md-4 col-lg-3">
+                            <a href="{% url 'home' %}" class="navbar-brand p-0">
+                                <img src="{% static 'img/logo.png' %}" alt="Logo Thư viện Alovu" class="img-fluid"
+                                    style="max-height: 50px;">
+                            </a>
+                        </div>
+
+                        <div class="col-md-4 col-lg-6 position-relative search-container">
+                            <form action="{% url 'book_list' %}" method="GET"
+                                class="d-flex border rounded-pill bg-light shadow-sm overflow-hidden">
+                                <input id="live-search-input" data-url="{% url 'api_live_search' %}"
+                                    class="form-control border-0 rounded-pill w-100 py-2 ps-4 bg-light" type="text"
+                                    name="q" placeholder="Tìm kiếm tên sách, tác giả..." value="{{ request.GET.q }}"
+                                    autocomplete="off">
+                                <button type="submit" class="btn btn-primary rounded-pill py-2 px-4 border-0"><i
+                                        class="fas fa-search"></i></button>
+                            </form>
+
+                            <div id="search-results-box"
+                                class="position-absolute w-100 bg-white rounded-4 shadow-lg border mt-2 overflow-hidden animate__animated animate__fadeIn"
+                                style="display: none; z-index: 1050; max-height: 400px; overflow-y: auto; top: 100%;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-lg-3 text-end">
+                            <div class="dropdown">
+                                <a href="#" class="dropdown-toggle text-dark fs-6 text-decoration-none fw-bold"
+                                    data-bs-toggle="dropdown" data-bs-display="static">
+                                    <div class="position-relative d-inline-block me-2">
+                                        {% if user.avatar and 'default.png' not in user.avatar.name %}
+                                        <img src="{{ user.avatar.url }}"
+                                            class="rounded-circle border border-primary object-fit-cover"
+                                            style="width: 30px; height: 30px;" alt="Avatar">
+                                        {% else %}
+                                        <i class="fa fa-user-circle fa-lg text-primary"></i>
+                                        {% endif %}
+                                        <span id="unread-count-header"
+                                            class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
+                                            style="display: none; width: 10px; height: 10px;">
+                                        </span>
+                                    </div>
+                                    {% if user.is_authenticated %} {{ user.username }} {% else %} Tài khoản {% endif %}
+                                </a>
+
+                                <div
+                                    class="dropdown-menu dropdown-menu-end rounded-4 shadow mt-2 border-0 animate__animated animate__fadeIn">
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url 'profile' %}" class="dropdown-item py-2">Quản lý hồ sơ</a>
+                                    <a href="{% url 'change_password' %}" class="dropdown-item py-2">Đổi mật khẩu</a>
+                                    <hr class="dropdown-divider">
+                                    <a href="{% url 'logout' %}"
+                                        class="dropdown-item text-danger fw-bold py-2 custom-confirm"
+                                        data-message="Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?">
+                                        Đăng xuất</a>
+                                    {% else %}
+                                    <a href="{% url 'login' %}" class="dropdown-item py-2">Đăng nhập</a>
+                                    <a href="{% url 'register' %}" class="dropdown-item py-2">Đăng ký</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid nav-bar p-0 shadow-sm">
+                    <div class="row gx-0 bg-white px-lg-5 align-items-center">
+                        <div class="col-lg-3 d-none d-lg-block">
+                            <nav class="navbar navbar-light" style="width: 250px;">
+                                <button class="navbar-toggler border-0 fs-5 w-100 px-0 text-start text-dark py-3"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#allCat">
+                                    <h5 class="m-0 text-dark fw-bold"><i class="fa fa-bars me-2 text-primary"></i>Danh
+                                        mục sách
+                                    </h5>
+                                </button>
+                                <div class="collapse navbar-collapse rounded-bottom" id="allCat">
+                                    <div class="navbar-nav ms-auto py-0 bg-white shadow-sm border-0 rounded-bottom">
+                                        {% for cat in categories %}
+                                        <a href="{% url 'book_list' %}?category={{ cat.id }}"
+                                            class="dropdown-item py-3 border-bottom small ajax-category-link"
+                                            data-category="{{ cat.id }}">
+                                            <i class="fas fa-chevron-right me-2 text-primary"
+                                                style="font-size: 0.7rem;"></i>{{cat.name }}
+                                        </a>
+                                        {% empty %}
+                                        <a href="#" class="dropdown-item py-2 text-muted">Chưa có danh mục</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="col-12 col-lg-9">
+                            <nav class="navbar navbar-expand-lg navbar-light bg-white py-0">
+                                <div class="navbar-nav ms-auto py-0">
+                                    <a href="{% url 'home' %}"
+                                        class="nav-item nav-link text-dark py-4 px-4 {% block nav_home %}{% endblock %}">Trang
+                                        chủ</a>
+
+                                    <a href="{% url 'book_list' %}"
+                                        class="nav-item nav-link text-dark py-4 px-4 {% block nav_book %}{% endblock %}">Kho
+                                        sách</a>
+
+                                    <a href="{% url 'premium_books' %}"
+                                        class="nav-item nav-link text-dark py-4 px-4 {% block nav_premium %}{% endblock %}">
+                                        <i class="fas fa-crown text-warning me-1"></i> Sách giới hạn
+                                    </a>
+
+                                    <a href="{% url 'event_list' %}"
+                                        class="nav-item nav-link text-dark py-4 px-4 {% block nav_event %}{% endblock %}">Sự
+                                        kiện</a>
+
+
+                                    <a href="{% url 'guide' %}"
+                                        class="nav-item nav-link text-dark py-4 px-4 {% block nav_guide %}{% endblock %}">Hướng
+                                        dẫn</a>
+
+                                    <a href="{% url 'contact' %}"
+                                        class="nav-item nav-link text-dark py-4 px-4 {% block nav_contact %}{% endblock %}">Liên
+                                        hệ</a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {% if messages %}
+            <div class="container-fluid px-lg-5 mt-3">
+                {% for message in messages %}
+                <div
+                    class="alert django-flash alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show shadow-sm border-0 rounded-3">
+                    <i
+                        class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endif %}
+
+            <main
+                class="{% if user.is_staff and '/staff/' in request.path or user.is_staff and '/profile/' in request.path or user.is_staff and '/change-password/' in request.path or user.role == 'STAFF' and '/staff/' in request.path or user.role == 'STAFF' and '/profile/' in request.path or user.role == 'STAFF' and '/change-password/' in request.path %}staff-main-content{% endif %}">
+                {% block content %}{% endblock %}
+            </main>
+
+            {% if user.is_staff and '/staff/' in request.path or user.is_staff and '/profile/' in request.path or user.is_staff and '/change-password/' in request.path or user.role == 'STAFF' and '/staff/' in request.path or user.role == 'STAFF' and '/profile/' in request.path or user.role == 'STAFF' and '/change-password/' in request.path %}
+        </div> <!-- end staff-content-wrapper -->
+    </div> <!-- end staff-wrapper -->
+    {% else %}
+    <footer class="full-footer">
+        <div class="container-fluid px-lg-5">
+            <div class="row g-5">
+                <div class="col-md-6 col-lg-4">
+                    <a href="{% url 'home' %}" class="navbar-brand p-0">
+                        <h3 class="text-white m-0"><i class="fas fa-book-reader text-secondary me-2"></i>Alovu Library
+                        </h3>
+                    </a>
+                    <p class="mt-4 mb-4 lh-base text-white-50">
+                        "Tri thức là sức mạnh. Hãy cùng Alovu khám phá thế giới qua từng trang sách."
+                    </p>
+                    <div class="d-flex social-icons mt-3">
+                        <a href="#" class="btn btn-outline-light btn-square rounded-circle me-2"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-square rounded-circle me-2"><i
+                                class="fab fa-github"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-square rounded-circle me-2"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-square rounded-circle"><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <h5 class="text-white mb-4">Liên kết nhanh</h5>
+                    <div class="d-flex flex-column footer-link-list justify-content-start">
+                        <a href="{% url 'home' %}"><i class="fas fa-chevron-right me-2"></i>Trang chủ</a>
+                        <a href="{% url 'book_list' %}"><i class="fas fa-chevron-right me-2"></i>Kho sách</a>
+                        <a href="{% url 'guide' %}"><i class="fas fa-chevron-right me-2"></i>Hướng dẫn & quy định</a>
+                        <a href="{% url 'contact' %}"><i class="fas fa-chevron-right me-2"></i>Liên hệ</a>
+                        <a href="{% url 'borrow_history' %}"><i class="fas fa-chevron-right me-2"></i>Lịch sử mượn</a>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <h5 class="text-white mb-4">Hỗ trợ</h5>
+                    <div class="d-flex flex-column footer-link-list justify-content-start">
+                        <a href="#"><i class="fas fa-chevron-right me-2"></i>Quy định</a>
+                        <a href="#"><i class="fas fa-chevron-right me-2"></i>Chính sách bảo mật</a>
+                        <a href="#"><i class="fas fa-chevron-right me-2"></i>Phản hồi</a>
+                        <a href="#"><i class="fas fa-chevron-right me-2"></i>Câu hỏi thường gặp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid copyright-bar py-3 mt-5 text-center">
+            <div class="container">
+                <span class="text-white-50 small">© 2026 <strong>Thư viện Alovu</strong>. Designed by <a href="#"
+                        class="text-primary fw-bold text-decoration-none">Lê Tuấn Anh</a>.</span>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+
+    <div class="modal fade" id="customConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-body p-4 text-center">
+                    <div class="text-primary mb-3 mt-2">
+                        <i class="fas fa-question-circle fa-4x opacity-75"></i>
+                    </div>
+
+                    <h6 class="fw-bold mb-4 text-dark lh-base" id="customConfirmMessage">
+                        Bạn có chắc chắn muốn thực hiện hành động này?
+                    </h6>
+
+                    <div class="d-flex justify-content-center gap-2 mb-2">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold border"
+                            data-bs-dismiss="modal">Hủy</button>
+                        <a href="#" id="customConfirmBtn"
+                            class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Đồng ý</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script src="{% static 'js/main.js' %}?v=10034"></script>
+    <script src="{% static 'js/api.js' %}?v=1009"></script>
+    <script src="{% static 'js/api_staff.js' %}?v=1005"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    {% load static %}
+    <script src="{% static 'js/axios_client.js' %}"></script>
+
+    {% if user.is_authenticated and not user.is_staff and user.role != 'STAFF' and not user.is_superuser %}
+    <script src="{% static 'js/chatbox.js' %}"></script>
+    {% endif %}
+
+    {% if messages and user.is_staff or messages and user.role == 'STAFF' or messages and user.is_superuser %}
+    <!-- Dữ liệu thông báo được truyền an toàn qua khối JSON để tránh lỗi cú pháp JS trong IDE -->
+    <script id="django-messages-data" type="application/json">
+        [
+            {% for message in messages %}
+            {
+                "tags": "{{ message.tags }}",
+                "text": "{{ message|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: function (toast) {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            // Đọc dữ liệu từ khối JSON đã chuẩn bị ở trên
+            const dataElement = document.getElementById('django-messages-data');
+            if (dataElement) {
+                const djangoMessages = JSON.parse(dataElement.textContent);
+                djangoMessages.forEach(function (msg) {
+                    Toast.fire({
+                        icon: msg.tags === 'error' ? 'error' : 'success',
+                        title: msg.text
+                    });
+                });
+            }
+        });
+    </script>
+    {% endif %}
+
+</body>
+
+</html>

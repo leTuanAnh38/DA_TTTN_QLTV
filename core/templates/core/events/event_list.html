@@ -1,0 +1,184 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Sự kiện & Tin tức - Thư viện Alovu{% endblock %}
+{% block nav_event %}active fw-bold{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="sticky-sidebar">
+                <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-9">
+            
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom gap-3">
+                <div>
+                    <h3 class="fw-bold m-0 text-dark">
+                        <i class="fas fa-bullhorn text-primary me-2"></i>Sự Kiện & Tin Tức
+                    </h3>
+                    <p class="text-muted small m-0 mt-2">Cùng tham gia các hoạt động giao lưu, tuần lễ đọc sách và nâng cao kỹ năng tại Thư viện.</p>
+                </div>
+                
+                <div class="bg-white text-primary px-4 py-2 rounded-pill fw-bold small shadow-sm border border-primary">
+                    <i class="fas fa-layer-group me-1"></i> Đang có {{ events.count }} sự kiện mở
+                </div>
+            </div>
+
+            <div class="row g-4">
+                {% for event in events %}
+                <div class="col-md-6 col-xl-4 d-flex align-items-stretch animate__animated animate__fadeInUp">
+                    <div class="card border-0 shadow-sm rounded-4 w-100 overflow-hidden transition-hover bg-white">
+                        
+                        <div class="position-relative" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#eventModal{{ event.id }}" title="Xem chi tiết sự kiện">
+                            <img src="{% if event.cover_image %}{{ event.cover_image.url }}{% else %}https://placehold.co/600x300?text=Event{% endif %}" 
+                                 class="card-img-top w-100" style="height: 200px; object-fit: cover;" alt="{{ event.title }}">
+                            
+                            <div class="position-absolute top-0 end-0 m-3 z-2">
+                                    {% if event.end_date and event.end_date < now %}
+                                        <span class="badge bg-white text-secondary border border-secondary px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                            <i class="fas fa-calendar-times me-1"></i> Đã kết thúc
+                                        </span>
+                                    {% elif event.start_date > now %}
+                                        <span class="badge bg-white text-success border border-success px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                            <i class="fas fa-calendar-plus me-1"></i> Sắp diễn ra
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-white text-warning border border-warning px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                            <i class="fas fa-fire me-1"></i> Đang diễn ra
+                                        </span>
+                                    {% endif %}
+                            </div>
+
+                            <div class="position-absolute bottom-0 start-0 m-3 bg-white rounded-4 shadow text-center overflow-hidden border" style="min-width: 60px; z-index: 2;">
+                                <div class="bg-danger text-white small fw-bold py-1 text-uppercase">Thg {{ event.start_date|date:"m" }}</div>
+                                <div class="text-dark fw-bold fs-4 py-1">{{ event.start_date|date:"d" }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4 d-flex flex-column">
+                            
+                            <div class="mb-3 text-muted small fw-medium d-flex align-items-center">
+                                <span class="text-primary bg-white border border-primary shadow-sm px-2 py-1 rounded me-2">
+                                    <i class="far fa-clock me-1"></i>{{ event.start_date|time:"H:i" }}
+                                    {% if event.end_date %}
+                                        - {{ event.end_date|time:"H:i" }}
+                                    {% endif %}
+                                </span>
+                                <span class="text-truncate" title="{{ event.location }}">
+                                    <i class="fas fa-map-marker-alt text-danger me-1"></i>{{ event.location }}
+                                </span>
+                            </div>
+                            
+                            <h5 class="fw-bold text-dark mb-2 line-clamp-2 event-title-hover" style="min-height: 48px; line-height: 1.4; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#eventModal{{ event.id }}">
+                                {{ event.title }}
+                            </h5>
+                            
+                            <p class="text-muted small mb-3 line-clamp-3" style="line-height: 1.5;">
+                                {{ event.content|striptags }}
+                            </p>
+                            
+                            <div class="mt-auto pt-3 border-top">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-muted small fw-medium">Người tham gia:</span>
+                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm">
+                                        <strong class="text-primary fs-6" id="count-{{ event.id }}">{{ event.registered_count }}</strong>
+                                        {% if event.max_participants > 0 %} / {{ event.max_participants }}{% endif %}
+                                    </span>
+                                </div>
+                                
+                                {% if event.end_date and event.end_date < now %}
+                                    <button type="button" class="btn btn-secondary w-100 rounded-pill py-2 fw-bold opacity-75 shadow-none" disabled>
+                                        <i class="fas fa-calendar-times me-1"></i> Sự kiện đã kết thúc
+                                    </button>
+                                {% else %}
+                                    <button type="button" 
+                                            class="btn btn-toggle-event w-100 rounded-pill py-2 fw-bold transition-hover shadow-sm {% if event.id in registered_event_ids %}btn-success{% else %}btn-outline-primary{% endif %}" 
+                                            data-url="{% url 'api_toggle_event_registration' event.id %}" 
+                                            data-id="{{ event.id }}">
+                                        {% if event.id in registered_event_ids %}
+                                            <i class="fas fa-check-circle me-1"></i> Đã tham gia
+                                        {% else %}
+                                            <i class="fas fa-ticket-alt me-1"></i> Đăng ký tham gia
+                                        {% endif %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="eventModal{{ event.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content border-0 rounded-4 shadow-lg">
+                            <div class="modal-header border-bottom-0 pb-0 position-absolute top-0 end-0 z-3">
+                                <button type="button" class="btn-close bg-white rounded-circle p-2 shadow-sm m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-0">
+                                <img src="{% if event.cover_image %}{{ event.cover_image.url }}{% else %}https://placehold.co/800x400?text=Event{% endif %}" 
+                                     class="w-100 rounded-top-4" style="height: 350px; object-fit: cover;" alt="{{ event.title }}">
+                                
+                                <div class="p-4 p-md-5">
+                                    <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+                                        {% if event.end_date and event.end_date < now %}
+                                            <span class="badge bg-white text-secondary border border-secondary px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                                <i class="fas fa-calendar-times me-1"></i> Đã kết thúc
+                                            </span>
+                                        {% elif event.start_date > now %}
+                                            <span class="badge bg-white text-success border border-success px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                                <i class="fas fa-calendar-plus me-1"></i> Sắp diễn ra
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-white text-warning border border-warning px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                                <i class="fas fa-fire me-1"></i> Đang diễn ra
+                                            </span>
+                                        {% endif %}
+                                        <span class="badge bg-white text-primary border border-primary px-3 py-2 rounded-pill fw-bold shadow-sm">
+                                            <i class="far fa-clock me-1"></i> Bắt đầu: {{ event.start_date|date:"d/m/Y - H:i" }}
+                                            {% if event.end_date %}
+                                                <span class="text-muted ms-1 fw-medium">| Kết thúc: {{ event.end_date|date:"d/m/Y - H:i" }}</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    
+                                    <h2 class="fw-bold text-dark mb-4">{{ event.title }}</h2>
+                                    
+                                    <div class="mb-4 p-3 bg-white shadow-sm rounded-3 border border-secondary border-opacity-25 d-inline-block">
+                                        <i class="fas fa-map-marker-alt text-danger me-2 fs-5"></i> 
+                                        <span class="fw-medium text-dark">{{ event.location }}</span>
+                                    </div>
+                                    
+                                    <div class="event-content text-dark lh-lg" style="font-size: 1.05rem;">
+                                        {{ event.content|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light border-top-0 rounded-bottom-4 p-3 d-flex justify-content-between align-items-center">
+                                <div class="text-muted small fw-medium ms-2">
+                                    Người tham gia: <strong class="text-primary fs-5">{{ event.registered_count }}</strong>{% if event.max_participants > 0 %} / {{ event.max_participants }}{% endif %}
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold shadow-sm" data-bs-dismiss="modal">Đóng cửa sổ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+                        <i class="far fa-calendar-times fa-4x text-muted opacity-25 mb-3"></i>
+                        <h5 class="fw-bold text-dark mb-1">Chưa có sự kiện nào</h5>
+                        <p class="text-muted mb-0">Thư viện hiện tại chưa có sự kiện nào sắp diễn ra.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

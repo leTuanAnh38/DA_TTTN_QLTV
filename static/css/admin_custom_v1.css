@@ -1,0 +1,17 @@
+/* 1. Ẩn đích danh thẻ chứa bảng Core và bảng Xác thực */
+.dashboard .app-core,
+.dashboard .app-auth {
+    display: none !important;
+}
+/* xóa */
+/* 2. Ẩn luôn toàn bộ cột bên trái (nếu nó để lại khoảng trống) */
+/* .dashboard #content-main {
+    display: none !important;
+} */
+
+/* 3. Phóng to bảng "Hoạt động gần đây" ra giữa cho đẹp */
+.dashboard #content-related,
+.dashboard .content .row>div:last-child {
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+}
