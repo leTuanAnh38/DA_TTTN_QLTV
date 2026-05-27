@@ -1,0 +1,250 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Hướng dẫn & Quy định - Thư viện Alovu{% endblock %}
+{% block nav_guide %}active fw-bold{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+
+        <div class="col-lg-3">
+            <div class="sticky-sidebar">
+                <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9 animate__animated animate__fadeInRight">
+
+            <div class="text-center mb-5 pb-2 border-bottom">
+                <span
+                    class="badge bg-light text-primary border border-primary px-3 py-2 rounded-pill mb-3 fw-medium shadow-sm">
+                    <i class="fas fa-book-reader me-1"></i> Thư viện Alovu
+                </span>
+                <h2 class="fw-bold text-dark mb-3">Hướng Dẫn & Quy Định</h2>
+                <div class="mx-auto bg-primary mb-4" style="width: 60px; height: 4px; border-radius: 2px;"></div>
+                <p class="text-muted fs-6 mx-auto mb-4" style="max-width: 700px; line-height: 1.6;">
+                    Khám phá quy trình mượn trả và các quy tắc để cùng nhau xây dựng văn hóa đọc văn minh tại thư viện.
+                </p>
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden guide-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                        <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3"
+                                style="width: 45px; height: 45px;">
+                                <i class="fas fa-hand-holding-heart fs-5"></i>
+                            </div>
+                            <h5 class="mb-0 fw-bold text-dark">1. Quy trình Mượn sách</h5>
+                        </div>
+                        <div class="card-body p-4 p-md-5">
+                            <div class="row g-4 position-relative step-container">
+                                <div class="col-md-3 text-center step-item">
+                                    <div class="step-icon bg-light text-primary mb-3 mx-auto shadow-sm border"><i
+                                            class="fas fa-cart-plus"></i></div>
+                                    <h6 class="fw-bold text-dark mb-2">1. Chọn sách</h6>
+                                    <p class="small text-muted mb-0 px-2">Thêm sách vào <a href="{% url 'view_cart' %}"
+                                            class="fw-bold text-primary text-decoration-none">Giỏ sách</a> (Tối đa 4
+                                        cuốn/lần).</p>
+                                </div>
+                                <div class="col-md-3 text-center step-item">
+                                    <div class="step-icon bg-light text-primary mb-3 mx-auto shadow-sm border"><i
+                                            class="far fa-calendar-check"></i></div>
+                                    <h6 class="fw-bold text-dark mb-2">2. Đặt lịch hẹn</h6>
+                                    <p class="small text-muted mb-0 px-2">Chọn Ngày và Ca trực (Sáng/Chiều) trong vòng 7
+                                        ngày tới.</p>
+                                </div>
+                                <div class="col-md-3 text-center step-item">
+                                    <div class="step-icon bg-light text-primary mb-3 mx-auto shadow-sm border"><i
+                                            class="fas fa-qrcode"></i></div>
+                                    <h6 class="fw-bold text-dark mb-2">3. Thanh toán</h6>
+                                    <p class="small text-muted mb-0 px-2">Chuyển khoản QR hoặc đóng Tiền mặt (áp dụng
+                                        cho Sách VIP).</p>
+                                </div>
+                                <div class="col-md-3 text-center step-item">
+                                    <div class="step-icon bg-light text-primary mb-3 mx-auto shadow-sm border"><i
+                                            class="fas fa-walking"></i></div>
+                                    <h6 class="fw-bold text-dark mb-2">4. Nhận sách</h6>
+                                    <p class="small text-muted mb-0 px-2">Đến quầy đọc MSSV để Thủ thư giao sách đúng ca
+                                        đã hẹn.</p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="alert alert-info border-info bg-info bg-opacity-10 mt-5 mb-0 rounded-3 small border-start border-4">
+                                <i class="fas fa-exclamation-circle text-info me-2"></i><strong>Lưu ý quan
+                                    trọng:</strong> Đơn đăng ký mượn sẽ bị <b>tự động hủy</b> nếu bạn không đến nhận
+                                sách trong ca đã đăng ký.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden guide-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                        <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3"
+                                style="width: 45px; height: 45px;">
+                                <i class="fas fa-undo fs-5"></i>
+                            </div>
+                            <h5 class="mb-0 fw-bold text-dark">2. Quy trình Trả sách</h5>
+                        </div>
+                        <div class="card-body p-4 p-md-5 bg-white">
+                            <div class="row align-items-center">
+                                <div class="col-md-7">
+                                    <ul class="list-unstyled mb-0 custom-list">
+                                        <li class="mb-4">
+                                            <h6 class="fw-bold text-dark"><i
+                                                    class="fas fa-check text-success me-2"></i>Báo trả trên hệ thống
+                                            </h6>
+                                            <p class="small text-muted ms-4 mb-0">Vào trang <a
+                                                    href="{% url 'borrow_history' %}"
+                                                    class="fw-bold text-success text-decoration-none">Lịch sử mượn</a>,
+                                                tích chọn một hoặc nhiều cuốn sách cần trả và bấm nút <span
+                                                    class="badge bg-primary">Trả sách ngay</span>.</p>
+                                        </li>
+                                        <li class="mb-4">
+                                            <h6 class="fw-bold text-dark"><i
+                                                    class="fas fa-check text-success me-2"></i>Giao sách vật lý</h6>
+                                            <p class="small text-muted ms-4 mb-0">Trạng thái sẽ đổi thành <span
+                                                    class="badge bg-warning text-dark">Chờ duyệt</span>. Hãy mang sách
+                                                đến quầy để Thủ thư kiểm tra.</p>
+                                        </li>
+                                        <li>
+                                            <h6 class="fw-bold text-dark"><i
+                                                    class="fas fa-check text-success me-2"></i>Nghiệm thu tình trạng
+                                            </h6>
+                                            <p class="small text-muted ms-4 mb-0">Thủ thư sẽ đánh giá sách (Bình thường
+                                                / Hư hỏng nhẹ / Mất) và hoàn tất quy trình trả cho bạn.</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-5 text-center d-none d-md-block">
+                                    <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=500&auto=format&fit=crop"
+                                        class="img-fluid rounded-4 shadow" alt="Trả sách">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden guide-card animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                        <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
+                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3"
+                                style="width: 45px; height: 45px;">
+                                <i class="fas fa-exclamation-triangle fs-5"></i>
+                            </div>
+                            <h5 class="mb-0 fw-bold text-dark">3. Quy định Phạt & Bồi thường</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive m-0">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light text-muted small text-uppercase">
+                                        <tr>
+                                            <th class="ps-4 py-3 border-0" style="width: 25%;">Hành vi vi phạm</th>
+                                            <th class="py-3 border-0" style="width: 45%;">Mô tả chi tiết</th>
+                                            <th class="pe-4 py-3 border-0" style="width: 30%;">Hình thức xử lý</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="ps-4 py-3 fw-bold text-dark">Trễ hạn trả sách</td>
+                                            <td class="py-3 small text-muted">Giữ sách quá thời gian quy định (Mặc định
+                                                14 ngày).</td>
+                                            <td class="pe-4 py-3"><span
+                                                    class="badge bg-white border border-danger text-danger rounded-pill px-3 py-1 fw-medium shadow-sm">Phạt
+                                                    5.000 VNĐ / Ngày</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4 py-3 fw-bold text-dark">Hư hỏng nhẹ</td>
+                                            <td class="py-3 small text-muted">Sách bị rách vài trang, bẩn, vẽ bậy nhưng
+                                                vẫn đọc được.</td>
+                                            <td class="pe-4 py-3"><span
+                                                    class="badge bg-white border border-warning text-warning rounded-pill px-3 py-1 fw-medium shadow-sm">Phạt
+                                                    10% giá gốc</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4 py-3 fw-bold text-dark border-bottom-0">Mất sách / Hỏng nặng
+                                            </td>
+                                            <td class="py-3 small text-muted border-bottom-0">Làm mất sách, rách nát
+                                                không thể phục hồi.</td>
+                                            <td class="pe-4 py-3 border-bottom-0"><span
+                                                    class="badge bg-white border border-dark text-dark rounded-pill px-3 py-1 fw-medium shadow-sm">Đền
+                                                    100% giá gốc</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light border-top p-4">
+                            <h6 class="fw-bold text-dark mb-2"><i
+                                    class="fas fa-money-check-alt text-primary me-2"></i>Hướng dẫn thanh toán nợ:</h6>
+                            <p class="small text-muted mb-0">Vào trang <a href="{% url 'profile' %}"
+                                    class="fw-bold text-primary text-decoration-none">Hồ sơ cá nhân</a>. Tại mục "Tình
+                                trạng phí phạt", bấm <b>Thanh toán</b> để quét mã VietQR hoặc đóng trực tiếp cho Thủ
+                                thư.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden guide-card animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+                        <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
+                            <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3"
+                                style="width: 45px; height: 45px;">
+                                <i class="fas fa-list-ul fs-5"></i>
+                            </div>
+                            <h5 class="mb-0 fw-bold text-dark">4. Nội quy Không gian Thư viện</h5>
+                        </div>
+                        <div class="card-body p-4 p-md-5 bg-white">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="p-4 rounded-4 h-100"
+                                        style="background-color: #f0fdf4; border: 1px solid #bbf7d0;">
+                                        <h6 class="fw-bold text-success mb-3"><i class="fas fa-smile-beam me-2"></i>Nên
+                                            làm</h6>
+                                        <ul class="list-unstyled small text-dark lh-lg mb-0">
+                                            <li><i class="fas fa-check text-success me-2"></i> Giữ yên lặng, đi nhẹ, nói
+                                                khẽ.</li>
+                                            <li><i class="fas fa-check text-success me-2"></i> Cập nhật đầy đủ MSSV và
+                                                Lớp trước khi mượn.</li>
+                                            <li><i class="fas fa-check text-success me-2"></i> Để sách đúng nơi quy định
+                                                sau khi đọc tại chỗ.</li>
+                                            <li><i class="fas fa-check text-success me-2"></i> Kiểm tra tình trạng sách
+                                                kỹ trước khi rời quầy.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-4 rounded-4 h-100"
+                                        style="background-color: #fef2f2; border: 1px solid #fecaca;">
+                                        <h6 class="fw-bold text-danger mb-3"><i class="fas fa-ban me-2"></i>Tuyệt đối
+                                            không</h6>
+                                        <ul class="list-unstyled small text-dark lh-lg mb-0">
+                                            <li><i class="fas fa-times text-danger me-2"></i> Mang đồ ăn, thức uống có
+                                                mùi vào thư viện.</li>
+                                            <li><i class="fas fa-times text-danger me-2"></i> Viết, vẽ, gập trang hay xé
+                                                sách.</li>
+                                            <li><i class="fas fa-times text-danger me-2"></i> Sử dụng thẻ/tài khoản của
+                                                người khác.</li>
+                                            <li><i class="fas fa-times text-danger me-2"></i> Mang sách ra khỏi thư viện
+                                                khi chưa làm thủ tục.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
