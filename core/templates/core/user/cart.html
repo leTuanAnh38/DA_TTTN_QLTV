@@ -1,0 +1,181 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Giỏ sách đăng ký mượn - Alovu{% endblock %}
+
+{% block content %}
+
+
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        
+        <div class="col-lg-3">
+            <div class="sticky-sidebar">
+                <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold text-dark m-0">
+                    <i class="fas fa-shopping-cart text-primary me-2"></i>Giỏ sách của bạn
+                </h3>
+                <a href="{% url 'book_list' %}" class="btn btn-light border rounded-pill px-4 fw-medium text-dark shadow-sm transition-hover">
+                    <i class="fas fa-arrow-left me-2"></i>Tiếp tục tìm sách
+                </a>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-xl-7 col-lg-12">
+                    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+                        {% if books %}
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead class="bg-light border-bottom">
+                                        <tr>
+                                            <th class="border-0 py-3 ps-4 text-muted small text-uppercase fw-bold" colspan="2">Tài liệu đăng ký</th>
+                                            <th class="border-0 py-3 text-end pe-4 text-muted small text-uppercase fw-bold">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for book in books %}
+                                        <tr class="transition-hover">
+                                            <td width="85" class="ps-4 py-3">
+                                                <img src="{{ book.get_cover }}" class="rounded-3 shadow-sm border" style="width: 60px; height: 85px; object-fit: cover;" alt="{{ book.title }}">
+                                            </td>
+                                            <td>
+                                                <h6 class="fw-bold text-dark mb-1">
+                                                    <a href="{% url 'book_detail' book.id %}" class="text-dark text-decoration-none">{{ book.title }}</a>
+                                                </h6>
+                                                <small class="text-muted d-block mb-1"><i class="far fa-user me-1"></i>{{ book.author|default:"Chưa rõ" }}</small>
+                                                {% if book.price > 0 %}
+                                                    <span class="badge bg-white border border-danger text-danger px-2 py-1 rounded-pill mt-1">
+                                                        <i class="fas fa-gem me-1"></i>{{ book.price|floatformat:0 }} VNĐ
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-white border border-success text-success px-2 py-1 rounded-pill mt-1">
+                                                        <i class="fas fa-check me-1"></i>Miễn phí
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <a href="{% url 'remove_from_cart' book.id %}" class="btn btn-sm btn-outline-danger rounded-circle shadow-sm" title="Xóa khỏi giỏ">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5 my-4">
+                                <i class="fas fa-box-open fa-4x mb-3 text-muted opacity-25"></i>
+                                <h5 class="fw-bold text-dark">Giỏ sách đang trống</h5>
+                                <p class="text-muted mb-4">Bạn chưa chọn cuốn sách nào để mượn cả.</p>
+                                <a href="{% url 'book_list' %}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+                                    Vào kho sách ngay
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if books %}
+                <div class="col-xl-5 col-lg-12">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white sticky-top" style="top: 100px;">
+                        <div class="bg-primary text-white p-4 pb-3">
+                            <h5 class="fw-bold m-0"><i class="fas fa-calendar-check me-2"></i>Hoàn tất đăng ký</h5>
+                            <p class="small m-0 mt-1 opacity-90">Gom {{ books|length }} cuốn sách vào 1 lượt mượn</p>
+                        </div>
+                        
+                        <form method="POST" action="{% url 'checkout_cart' %}">
+                            {% csrf_token %}
+                            <div class="p-4">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-2"><i class="far fa-calendar-alt me-2 text-primary"></i>1. Chọn ngày đến quầy</label>
+                                <div class="input-group shadow-sm rounded-3 mb-4 transition-hover">
+                                    <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="far fa-calendar-check text-primary"></i></span>
+                                    <input type="date" name="pickup_date" class="form-control border-start-0 bg-light rounded-end-3 py-2 px-3 fw-medium" min="{% now 'Y-m-d' %}" required style="box-shadow: none;">
+                                </div>
+
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-2"><i class="far fa-clock me-2 text-primary"></i>2. Chọn buổi hẹn</label>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="pickup_shift" id="shiftSang" value="SANG" required>
+                                        <label class="w-100 py-3 rounded-4 cart-radio-card d-flex flex-column align-items-center shadow-sm" for="shiftSang">
+                                            <i class="fas fa-sun mb-2 fs-4 text-warning shift-icon"></i>
+                                            <span class="fw-bold text-dark">Ca Sáng</span>
+                                            <small class="text-muted" style="font-size: 0.75rem;">07:30 - 11:30</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="pickup_shift" id="shiftChieu" value="CHIEU" required>
+                                        <label class="w-100 py-3 rounded-4 cart-radio-card d-flex flex-column align-items-center shadow-sm" for="shiftChieu">
+                                            <i class="fas fa-cloud-sun mb-2 fs-4 text-info shift-icon"></i>
+                                            <span class="fw-bold text-dark">Ca Chiều</span>
+                                            <small class="text-muted" style="font-size: 0.75rem;">13:00 - 17:00</small>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {% if total_fee > 0 %}
+                                    <div class="d-flex justify-content-between align-items-center mb-4 pt-4 border-top border-2 border-dashed">
+                                        <span class="fw-bold text-dark">Tổng phí dịch vụ:</span>
+                                        <span class="h4 fw-bold text-danger mb-0">{{ total_fee|floatformat:0 }} VNĐ</span>
+                                    </div>
+                                    
+                                    <label class="form-label small fw-bold text-muted text-uppercase mb-2"><i class="far fa-credit-card me-2 text-primary"></i>3. Thanh toán</label>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-12">
+                                            <input class="btn-check" type="radio" name="payment_method" id="payCash" value="CASH" checked onchange="document.getElementById('qrBox').style.display='none'">
+                                            <label class="w-100 text-start p-3 rounded-4 cart-radio-card shadow-sm d-flex align-items-center" for="payCash">
+                                                <div class="p-2 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background-color: rgba(25, 135, 84, 0.1);">
+                                                    <i class="fas fa-wallet text-success fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">Tiền mặt tại quầy</div>
+                                                    <div class="small text-muted" style="font-size: 0.75rem;">Thanh toán khi nhận sách</div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <div class="col-12">
+                                            <input class="btn-check" type="radio" name="payment_method" id="payBank" value="BANK" onchange="document.getElementById('qrBox').style.display='block'">
+                                            <label class="w-100 text-start p-3 rounded-4 cart-radio-card shadow-sm d-flex align-items-center" for="payBank">
+                                                <div class="p-2 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background-color: rgba(13, 110, 253, 0.1);">
+                                                    <i class="fas fa-qrcode text-primary fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">Chuyển khoản QR</div>
+                                                    <div class="small text-muted" style="font-size: 0.75rem;">Quét mã thanh toán nhanh chóng</div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="qrBox" class="p-3 bg-light border border-primary rounded-4 text-center shadow-sm mb-4 animate__animated animate__fadeIn" style="display: none;">
+                                        <img src="{% static 'img/qr.png' %}" alt="QR" class="img-fluid rounded-3 border mb-2 shadow-sm" style="max-width: 130px;">
+                                        <div class="small text-dark mt-2 bg-white p-2 rounded-3 border border-dashed">
+                                            Nội dung: <strong class="text-danger">Mượn sách {{ request.user.msv }}</strong>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <input type="hidden" name="payment_method" value="FREE">
+                                {% endif %}
+
+                                <button type="submit" class="btn btn-primary w-100 py-3 mt-3 rounded-pill fw-bold shadow-lg transition-hover">
+                                    XÁC NHẬN ĐĂNG KÝ
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
