@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Thông báo - Alovu Library{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        <div class="col-lg-3">
+             <div class="sticky-sidebar">
+                <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="m-0 fw-bold text-dark">Hộp thư thông báo</h4>
+                        <span class="text-muted small">Bạn có {{ notifications.paginator.count|default:notifications.count }} thông báo</span>
+                    </div>
+
+                    <div class="notification-list" id="notification-container">
+                        {% for n in notifications %}
+                        <div class="p-3 mb-3 rounded-3 border-start border-4 {% if n.status == 'UNREAD' %}bg-light border-primary{% else %}border-secondary{% endif %}" style="transition: 0.3s;">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3 mt-1">
+                                        {% if n.type == 'REMINDER' %}
+                                            <i class="fas fa-clock text-warning fs-4"></i>
+                                        {% elif n.type == 'WARNING' %}
+                                            <i class="fas fa-exclamation-triangle text-danger fs-4"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle text-primary fs-4"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <p class="mb-1 {% if n.status == 'UNREAD' %}fw-bold text-dark{% else %}text-muted{% endif %}">
+                                            {{ n.message|safe }}
+                                        </p>
+                                        <small class="text-muted"><i class="far fa-clock me-1"></i>{{ n.created_at|timesince }} trước</small>
+                                    </div>
+                                </div>
+                                {% if n.status == 'UNREAD' %}
+                                    <span class="badge bg-primary rounded-circle p-1" style="width: 10px; height: 10px;"> </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-comment-slash fa-3x mb-3 opacity-25"></i>
+                            <p class="mt-3 text-muted">Bạn chưa có thông báo nào!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="scroll-trigger" 
+                         data-url="{% url 'api_load_more_notifications' %}" 
+                         data-page="2" 
+                         data-has-next="{% if notifications.has_next %}true{% else %}false{% endif %}">
+                    </div>
+                    
+                    <div id="loading-spinner" class="text-center py-4" style="display: none;">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
