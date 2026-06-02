@@ -1,0 +1,87 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Kho sách - Thư viện Alovu{% endblock %}
+{% block nav_book %}active fw-bold{% endblock %}
+
+{% block content %}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="sticky-sidebar">
+                <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="bg-white p-4 rounded-3 shadow-sm border mb-4">
+                <div class="text-center mb-5">
+                    <h1 class="display-5 fw-bold text-primary">
+                        {% if category_obj %}
+                            Danh mục: {{ category_obj.name }}
+                        {% else %}
+                            Toàn Bộ Kho Sách
+                        {% endif %}
+                    </h1>
+                    <div class="mx-auto bg-primary" style="width: 100px; height: 3px;"></div>
+                </div>
+                
+                <form method="GET" action="{% url 'book_list' %}" class="row g-3 mb-4">
+                    {% if query %}
+                        <input type="hidden" name="q" value="{{ query }}">
+                    {% endif %}
+
+                    <div class="col-md-6">
+                        <label class="small text-muted mb-1 fw-bold">Sắp xếp theo:</label>
+                        <select name="sort" id="sort-filter" class="form-select border-light shadow-none bg-light text-muted">
+                            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Mới nhất</option>
+                            <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Tiêu đề (A-Z)</option>
+                            <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Cũ nhất</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="small text-muted mb-1 fw-bold">Lọc theo danh mục:</label>
+                        <select name="category" id="category-filter" class="form-select border-light shadow-none bg-light text-muted">
+                            <option value="">Tất cả danh mục</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if current_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+
+                <div class="row g-4" id="book-list-container">
+                    {% for book in books %}
+                        
+                        {% include 'core/includes/book_card.html' %}
+
+                    {% empty %}
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-book-open fa-3x text-muted opacity-25 mb-3"></i>
+                            <p class="text-muted">Không tìm thấy cuốn sách nào phù hợp với yêu cầu của bạn.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="text-center mt-5 mb-3" id="load-more-section" {% if not books.has_next %}style="display: none;"{% endif %}>
+                    <button id="btn-load-more" class="btn btn-outline-primary rounded-pill px-5 py-2 fw-bold shadow-sm"
+                            data-url="{% url 'api_load_more_books' %}" 
+                            data-page="2" 
+                            data-query="{{ query }}" 
+                            data-category="{{ current_category }}" 
+                            data-sort="{{ current_sort }}">
+                        <i class="fas fa-arrow-down me-2"></i>Xem thêm sách
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
