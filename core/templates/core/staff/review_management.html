@@ -1,0 +1,189 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Quản lý Đánh giá Sách - Alovu{% endblock %}
+
+{% block staff_title %}Quản lý Đánh giá Sách{% endblock %}
+{% block nav_staff_review %}active{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold m-0 text-dark">Thống kê Đánh giá</h3>
+            <div class="d-flex align-items-center gap-3 mt-2">
+                <div class="text-muted small">
+                    <i class="fas fa-comments me-1"></i> 
+                    <span class="fw-bold text-dark">{{ total_reviews }}</span> lượt đánh giá
+                </div>
+                <div class="vr text-muted opacity-25"></div>
+                <div class="text-muted small">
+                    <i class="fas fa-users me-1"></i> 
+                    <span class="fw-bold text-dark">{{ total_reviewers }}</span> người đã đánh giá
+                </div>
+            </div>
+        </div>
+                
+                <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+                    <div class="bg-white rounded-pill shadow-sm p-1 border">
+                        <form method="GET" action="{% url 'staff_review_management' %}" class="d-flex align-items-center m-0">
+                            <i class="fas fa-search text-muted ms-3"></i>
+                            <input type="text" name="search_query" class="form-control border-0 shadow-none bg-transparent px-3 py-1" 
+                                   style="width: 250px; font-size: 0.9rem;"
+                                   placeholder="Tìm tên sách hoặc tác giả..." 
+                                   value="{{ query|default:'' }}">
+                            {% if query %}
+                                <a href="{% url 'staff_review_management' %}" class="btn btn-sm btn-light text-muted me-1 rounded-circle" title="Xóa tìm kiếm">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            {% endif %}
+                            <button class="btn btn-dark btn-sm px-4 rounded-pill fw-medium me-1" type="submit">Tìm kiếm</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-borderless table-hover align-middle mb-0">
+                        <thead class="border-bottom bg-light">
+                            <tr>
+                                <th class="text-muted fw-semibold small text-uppercase py-3 ps-4" style="letter-spacing: 0.5px;">Tài liệu</th>
+                                <th class="text-muted fw-semibold small text-uppercase py-3 text-center" style="letter-spacing: 0.5px;">Rating trung bình</th>
+                                <th class="text-muted fw-semibold small text-uppercase py-3 text-center" style="letter-spacing: 0.5px;">Lượt nhận xét</th>
+                                <th class="text-muted fw-semibold small text-uppercase py-3" style="letter-spacing: 0.5px;">Phản hồi mới nhất</th>
+                                <th class="text-muted fw-semibold small text-uppercase py-3 text-end pe-4" style="letter-spacing: 0.5px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            {% for book in books %}
+                            <tr class="border-bottom animate__animated animate__fadeIn">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ book.get_cover }}" class="rounded me-3 border" style="width: 38px; height: 52px; object-fit: cover;">
+                                        <div>
+                                            <div class="fw-bold text-dark text-truncate" style="max-width: 200px; font-size: 0.95rem;">
+                                                {{ book.title }}
+                                            </div>
+                                            <small class="text-muted">Tác giả: {{ book.author|default:"Chưa rõ" }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                                <td class="text-center">
+                                    <div class="d-inline-flex align-items-center px-3 py-1 rounded-pill border border-warning">
+                                        <span class="fw-bold text-dark me-1">{{ book.avg_rating|floatformat:1 }}</span>
+                                        <i class="fas fa-star text-warning" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="fw-semibold text-dark">{{ book.review_count }}</span>
+                                    <small class="text-muted"> lượt</small>
+                                </td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light border rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                            <i class="far fa-user text-muted" style="font-size: 0.85rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium text-dark small" style="line-height: 1.2;">{{ book.latest_reviewer|default:"Ẩn danh" }}</div>
+                                            <div class="text-muted" style="font-size: 0.7rem;">{{ book.latest_review_date|date:"d/m/Y H:i" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-light border px-3 fw-medium rounded-2 text-dark shadow-none btn-view-reviews"
+                                            data-book-id="{{ book.id }}"
+                                            data-url="{% url 'api_staff_get_book_reviews' book.id %}">
+                                        Xem chi tiết
+                                    </button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="py-3">
+                                        <i class="far fa-comment-alt fa-3x text-muted opacity-25 mb-3"></i>
+                                        <p class="text-muted mb-0 fw-medium">Chưa có dữ liệu đánh giá nào.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {% if books.has_other_pages %}
+            <div class="d-flex justify-content-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm shadow-sm bg-white rounded-3 overflow-hidden border m-0">
+                        {% if books.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?search_query={{ query|default:'' }}&page={{ books.previous_page_number }}">
+                                    Trước
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in books.paginator.page_range %}
+                            {% if books.number == num %}
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link bg-dark text-white border-0 fw-bold px-3 py-2">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?search_query={{ query|default:'' }}&page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if books.has_next %}
+                            <li class="page-item">
+                                <a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?search_query={{ query|default:'' }}&page={{ books.next_page_number }}">
+                                    Sau
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Modal Xem chi tiết đánh giá -->
+        <div class="modal fade" id="reviewDetailModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 rounded-4 shadow-lg">
+                    <div class="modal-header border-bottom bg-light px-4 py-3">
+                        <h5 class="modal-title fw-bold text-dark" id="modal-book-title">Chi tiết đánh giá</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="px-4 py-3 bg-white border-bottom d-flex align-items-center justify-content-between">
+                            <div class="text-muted small">
+                                <i class="fas fa-users me-1"></i> 
+                                <span id="modal-total-reviewers" class="fw-bold text-dark">0</span> lượt đánh giá cho tài liệu này
+                            </div>
+                        </div>
+                        <div id="modal-reviews-container" class="overflow-auto" style="max-height: 500px;">
+                            <!-- Reviews will be loaded here -->
+                            <div class="p-5 text-center text-muted">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Đang tải dữ liệu...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top px-4 py-3">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
