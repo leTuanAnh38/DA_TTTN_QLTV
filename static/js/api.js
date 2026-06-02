@@ -16,7 +16,6 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
 // Read CSRF token from meta tag, cookie, or any hidden input on page
 function getCSRFToken() {
     var meta = document.querySelector('meta[name="csrf-token"]');
@@ -27,7 +26,6 @@ function getCSRFToken() {
     if (input) return input.value;
     return '';
 }
-
 // Bảo mật XSS: Làm sạch dữ liệu trước khi render ra HTML
 function escapeHTML(str) {
     if (typeof str !== 'string') return str;
