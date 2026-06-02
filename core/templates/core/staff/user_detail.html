@@ -1,0 +1,199 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết người đọc - Admin Alovu{% endblock %}
+
+{% block staff_title %}Chi tiết Người dùng{% endblock %}
+{% block nav_staff_user %}active{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden animate__animated animate__fadeIn">
+                
+                <div class="card-header bg-white border-0 p-4 pb-0">
+                    <div class="d-flex align-items-center pb-4 border-bottom">
+                        <div class="me-4 position-relative">
+                            {% if reader.avatar and 'default.png' not in reader.avatar.name %}
+                                <img src="{{ reader.avatar.url }}" 
+                                     alt="{{ reader.username }}" 
+                                     class="rounded-circle border border-4 border-white shadow-sm" 
+                                     style="width: 120px; height: 120px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm border border-4 border-primary" 
+                                     style="width: 120px; height: 120px; font-size: 3rem; font-weight: bold;">
+                                    {{ reader.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle p-2" title="Đang hoạt động"></span>
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h2 class="fw-bold mb-1 text-dark">{{ reader.get_full_name|default:reader.username }}</h2>
+                                    <p class="text-muted mb-3"><i class="fas fa-circle-notch fa-spin text-primary me-1"></i> Thành viên Alovu</p>
+                                </div>
+                                <div class="text-end">
+                                    <div class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm">
+                                        <i class="fas fa-award me-1"></i> {{ reader.points|default:0 }} Điểm thưởng
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-2 mt-1">
+                                <div class="col-sm-4">
+                                    <div class="p-2 bg-light rounded-3">
+                                        <small class="text-muted d-block">Mã sinh viên</small>
+                                        <span class="fw-bold">{{ reader.msv|default:"---" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="p-2 bg-light rounded-3">
+                                        <small class="text-muted d-block">Lớp hành chính</small>
+                                        <span class="fw-bold">{{ reader.lop|default:"---" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="p-2 bg-light rounded-3">
+                                        <small class="text-muted d-block">Địa chỉ Email</small>
+                                        <span class="fw-bold text-truncate d-block">{{ reader.email|default:"Chưa cập nhật email" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <h6 class="text-uppercase small fw-bold text-primary mb-4 d-flex align-items-center">
+                                        <span class="bg-primary text-white rounded-circle p-2 me-2 d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                            <i class="fas fa-book-reader small"></i>
+                                        </span>
+                                        Mượn sách gần đây
+                                    </h6>
+                                    
+                                    <div class="timeline-simple">
+                                        {% for item in borrow_history|slice:":5" %}
+                                        
+                                        <div class="mb-4 position-relative ps-3 border-start border-3 {% if item.status == 'OVERDUE' or item.is_late %}border-danger{% elif item.status == 'RETURNED' %}border-success{% else %}border-primary{% endif %} animate__animated animate__fadeInUp">
+                                            
+                                            <div class="fw-bold text-dark mb-1">{{ item.book.title }}</div>
+                                            
+                                            <div class="d-flex justify-content-between align-items-start mt-2">
+                                                
+                                                <div class="d-flex flex-column gap-1">
+                                                    {% if item.status == 'PENDING' and item.reason != 'YÊU CẦU TRẢ' and item.pickup_date %}
+                                                        <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> Hẹn lấy: <strong class="text-dark">{{ item.pickup_date|date:"d/m/Y" }}</strong></small>
+                                                    {% elif item.status == 'CANCELLED' %}
+                                                        <small class="text-muted"><i class="far fa-calendar-times me-1"></i> Đã hủy</small>
+                                                    {% else %}
+                                                        {% if item.borrow_date %}
+                                                            <small class="text-muted"><i class="far fa-calendar-check me-1"></i> Mượn: <strong class="text-dark">{{ item.borrow_date|date:"d/m/Y" }}</strong></small>
+                                                        {% endif %}
+                                                        
+                                                        <small class="text-muted"><i class="far fa-clock me-1"></i> Hạn: <strong class="{% if item.status == 'OVERDUE' %}text-danger{% else %}text-dark{% endif %}">{{ item.due_date|date:"d/m/Y"|default:"-" }}</strong></small>
+                                                        
+                                                        {% if item.status == 'RETURNED' %}
+                                                            <small class="{% if item.is_late %}text-danger{% else %}text-success{% endif %} fw-medium">
+                                                                <i class="fas fa-check-double me-1"></i> Đã trả: <strong>{{ item.return_date|date:"d/m/Y" }}</strong>
+                                                            </small>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div>
+                                                    {% if item.status == 'BORROWED' %}
+                                                        <span class="badge bg-primary rounded-pill px-3 py-1 shadow-sm">Đang mượn</span>
+                                                    {% elif item.status == 'OVERDUE' %}
+                                                        <span class="badge bg-danger rounded-pill px-3 py-1 shadow-sm">Quá hạn</span>
+                                                    {% elif item.status == 'PENDING' %}
+                                                        {% if item.reason == 'YÊU CẦU TRẢ' %}
+                                                            <span class="badge bg-warning text-dark rounded-pill px-3 py-1 shadow-sm">Chờ duyệt trả</span>
+                                                        {% else %}
+                                                            <span class="badge bg-info text-dark rounded-pill px-3 py-1 shadow-sm">Chờ đến lấy</span>
+                                                        {% endif %}
+                                                    {% elif item.status == 'CANCELLED' %}
+                                                        <div class="text-end">
+                                                            <span class="badge bg-secondary rounded-pill px-3 py-1 shadow-sm">Đã hủy</span>
+                                                            <div class="mt-1 text-muted fw-medium" style="font-size: 0.7rem;">
+                                                                Lý do: Bỏ hẹn ca {% if item.pickup_shift == 'SANG' %}Sáng{% else %}Chiều{% endif %} ngày {{ item.pickup_date|date:"d/m/Y" }}
+                                                            </div>
+                                                        </div>
+                                                    {% elif item.status == 'RETURNED' %}
+                                                        {% if item.is_late %}
+                                                            <span class="badge bg-danger rounded-pill px-3 py-1 shadow-sm">Trả trễ</span>
+                                                        {% else %}
+                                                            <span class="badge bg-success rounded-pill px-3 py-1 shadow-sm">Hoàn tất</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="badge bg-success rounded-pill px-3 py-1 shadow-sm">Hoàn tất</span>
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fas fa-ghost fa-2x mb-2 d-block opacity-25"></i>
+                                            <small>Chưa có lịch sử mượn sách</small>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <h6 class="text-uppercase small fw-bold text-danger mb-4 d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <span class="bg-danger text-white rounded-circle p-2 me-2 d-inline-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                                <i class="fas fa-file-invoice-dollar small"></i>
+                                            </span>
+                                            Lịch sử nợ phạt
+                                        </div>
+                                        <span class="badge bg-danger shadow-sm">{{ reader.total_fine|default:0 }} VNĐ</span>
+                                    </h6>
+
+                                    <div class="list-group list-group-flush bg-transparent">
+                                        {% for p in penalties %}
+                                        <div class="list-group-item bg-transparent border-0 px-0 mb-3 animate__animated animate__fadeInUp">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="small text-dark fw-medium">{{ p.reason }}</div>
+                                                <span class="text-danger fw-bold small text-nowrap">{{ p.amount }} đ</span>
+                                            </div>
+                                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">{{ p.created_at|date:"d/m/Y" }}</small>
+                                                <span class="badge {% if p.status == 'PAID' %}bg-success{% else %}bg-danger{% endif %} rounded-pill" style="font-size: 0.65rem;">
+                                                    {{ p.get_status_display }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="text-center py-4 text-success">
+                                            <i class="fas fa-smile-beam fa-2x mb-2 d-block opacity-50"></i>
+                                            <small>Tuyệt vời! Không có nợ phạt.</small>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 p-4 text-end">
+                    <hr class="mt-0 mb-4 opacity-10">
+                    <a href="{% url 'staff_user_management' %}" class="btn btn-outline-secondary rounded-pill px-4 fw-bold me-2">
+                        <i class="fas fa-undo me-2"></i> Quay lại
+                    </a>
+                </div>
+                
+    </div>
+</div>
+{% endblock %}
