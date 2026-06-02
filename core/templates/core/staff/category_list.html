@@ -1,0 +1,157 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Quản lý danh mục - Admin Alovu{% endblock %}
+
+{% block staff_title %}Quản lý Danh mục Sách{% endblock %}
+{% block nav_category %}active{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold text-dark m-0">Danh mục sách</h3>
+            <div class="d-flex align-items-center gap-3 mt-1">
+                <p class="text-muted small m-0">Phân loại tài liệu theo chủ đề và lĩnh vực nghiên cứu.</p>
+                <div class="vr text-muted opacity-25" style="height: 12px;"></div>
+                <span class="badge bg-primary rounded-pill px-3 py-1 shadow-sm"><i class="fas fa-tags me-1"></i> Tổng: {{ total_categories }}</span>
+            </div>
+        </div>
+
+                <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+                    <div class="bg-white rounded-pill shadow-sm p-1 border">
+                        <form method="GET" action="{% url 'staff_category_list' %}"
+                            class="d-flex align-items-center m-0">
+                            <i class="fas fa-search text-muted ms-3"></i>
+                            <input type="text" name="search_query"
+                                class="form-control border-0 shadow-none bg-transparent px-3 py-1"
+                                style="width: 250px; font-size: 0.9rem;" placeholder="Tìm tên danh mục hoặc mô tả..."
+                                value="{{ query|default:'' }}">
+                            {% if query %}
+                            <a href="{% url 'staff_category_list' %}"
+                                class="btn btn-sm btn-light text-muted me-1 rounded-circle" title="Xóa tìm kiếm">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            {% endif %}
+                            <button class="btn btn-dark btn-sm px-4 rounded-pill fw-medium me-1" type="submit">Tìm
+                                kiếm</button>
+                        </form>
+                    </div>
+                    <a href="{% url 'staff_category_add' %}"
+                        class="btn btn-primary rounded-pill py-2 px-4 fw-bold shadow-sm text-nowrap">
+                        <i class="fas fa-plus-circle me-2"></i>Thêm danh mục mới
+                    </a>
+                </div>
+            </div>
+
+
+
+            <div class="bg-white rounded-4 shadow-sm border overflow-hidden mb-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3 ps-4 text-muted small text-uppercase fw-bold" width="80">STT
+                                </th>
+                                <th class="border-0 py-3 text-muted small text-uppercase fw-bold">Tên danh mục</th>
+                                <th class="border-0 py-3 text-muted small text-uppercase fw-bold">Mô tả chi tiết</th>
+                                <th class="border-0 py-3 text-end pe-4 text-muted small text-uppercase fw-bold">Thao tác</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in categories %}
+                            <tr class="animate__animated animate__fadeIn">
+                                <td class="ps-4 py-3 fw-medium text-muted small">
+                                    #{{ forloop.counter0|add:categories.start_index }}
+                                </td>
+
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success border border-success border-2 rounded-3 p-2 me-3 shadow-sm bg-white"
+                                            style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-tag text-success" style="font-size: 0.9rem;"></i>
+                                        </div>
+                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ item.name }}</div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="text-muted small text-truncate" style="max-width: 400px;"
+                                        title="{{ item.description }}">
+                                        {{ item.description|default:"Chưa có mô tả cho danh mục này." }}
+                                    </div>
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{% url 'staff_category_edit' item.pk %}"
+                                            class="btn btn-sm btn-light border rounded-pill px-3 fw-medium text-dark shadow-none transition-hover text-nowrap">
+                                            <i class="far fa-edit me-1"></i>Sửa
+                                        </a>
+                                        <a href="{% url 'staff_category_delete' item.pk %}" 
+                                            class="btn btn-sm btn-outline-danger border rounded-circle d-flex align-items-center justify-content-center custom-confirm shadow-none transition-hover"
+                                            style="width: 32px; height: 32px;"
+                                            data-message="Xác nhận xóa danh mục [{{ item.name }}] khỏi hệ thống? Các sách thuộc danh mục này sẽ bị chuyển về trạng thái [Chưa có danh mục].">
+                                            <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="opacity-50">
+                                        <i class="fas fa-tags fa-3x mb-3 text-muted"></i>
+                                        <p class="fw-medium">Không tìm thấy danh mục nào phù hợp.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if categories.has_other_pages %}
+                <div class="card-footer bg-white border-top p-4 d-flex justify-content-center">
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0 gap-2">
+                            {% if categories.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link rounded-circle border-0 shadow-sm bg-light text-dark px-3 py-2"
+                                    href="?search_query={{ query|default:'' }}&page={{ categories.previous_page_number }}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in categories.paginator.page_range %}
+                            {% if categories.number == num %}
+                            <li class="page-item active">
+                                <span
+                                    class="page-link rounded-circle border-0 shadow-sm bg-success px-3 py-2 fw-bold text-white">{{
+                                    num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link rounded-circle border-0 shadow-sm bg-light text-dark px-3 py-2"
+                                    href="?search_query={{ query|default:'' }}&page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if categories.has_next %}
+                            <li class="page-item">
+                                <a class="page-link rounded-circle border-0 shadow-sm bg-light text-dark px-3 py-2"
+                                    href="?search_query={{ query|default:'' }}&page={{ categories.next_page_number }}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+</div>
+{% endblock %}
