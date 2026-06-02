@@ -1,0 +1,265 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Hồ sơ cá nhân - Alovu{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<link href="{% static 'css/style.css' %}?v=1.1" rel="stylesheet">
+
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        
+        {% if not user.is_staff and user.role != 'STAFF' and not user.is_superuser %}
+        <div class="col-lg-3">
+             <div class="sticky-sidebar">
+                <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
+                    {% include 'core/includes/sidebar.html' %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="{% if user.is_staff or user.role == 'STAFF' or user.is_superuser %}col-lg-12{% else %}col-lg-9{% endif %}">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-start border-4 border-primary ps-3">
+                        <h4 class="fw-bold m-0 text-dark">
+                            <i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ cá nhân của bạn
+                        </h4>
+                        <button id="btn-edit-toggle" class="btn btn-outline-primary rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="fas fa-edit me-2"></i>Chỉnh sửa hồ sơ
+                        </button>
+                    </div>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="alert {% if user.total_fine > 0 %}alert-danger{% elif has_processing %}alert-warning{% else %}alert-success{% endif %} border-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center p-4 mb-0">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-white rounded-circle p-2 text-{% if user.total_fine > 0 %}danger{% elif has_processing %}warning{% else %}success{% endif %} me-3 shadow-sm">
+                                        <i class="fas fa-hand-holding-usd fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <strong class="d-block text-dark">Tình trạng phí phạt</strong>
+                                        {% if has_processing %}
+                                            <small class="text-warning fw-bold">Đang chờ xác nhận</small>
+                                        {% else %}
+                                            <small class="text-muted">Tổng nợ quá hạn</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    {% if has_processing and not has_unpaid %}
+                                        <h4 class="mb-0 fw-bold text-dark">{{ processing_amount|default:0 }} VNĐ</h4>
+                                        <button class="btn btn-warning btn-sm rounded-pill fw-bold px-3 shadow-sm border text-dark" disabled style="opacity: 0.85;">
+                                            <i class="fas fa-clock me-1"></i>Chờ duyệt...
+                                        </button>
+                                    {% else %}
+                                        <h4 class="mb-0 fw-bold">{{ user.total_fine|default:0 }} VNĐ</h4>
+                                        {% if user.total_fine > 0 %}
+                                            <button class="btn btn-light btn-sm rounded-pill fw-bold px-3 shadow-sm border" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                                                Thanh toán
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light rounded-4 h-100 p-4 border-start border-4 border-warning shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <strong class="text-muted small text-uppercase d-block">Hạng thành viên</strong>
+                                        <h4 class="fw-bold mb-0 {{ user.rank_info.color }}">{{ user.rank_info.level }}</h4>
+                                    </div>
+                                    <div class="bg-white border border-warning rounded-3 text-warning shadow-sm d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-crown fs-4"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="d-flex justify-content-between mb-1 small">
+                                        <span class="fw-bold text-dark"><i class="fas fa-star text-warning me-1"></i>{{ user.points }} điểm</span>
+                                        {% if user.rank_info.next and user.rank_info.next > 0 %}
+                                            <span class="text-muted small">Lên hạng tại: {{ user.rank_info.next }} điểm</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="progress" style="height: 8px; border-radius: 10px; background-color: #e9ecef;">
+                                        {% if user.rank_info.next and user.rank_info.next > 0 %}
+                                            {% widthratio user.points user.rank_info.next 100 as width_percent %}
+                                            <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ width_percent }}%"></div>
+                                        {% else %}
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
+                                        {% endif %}
+                                    </div>
+                                    {% if not user.rank_info.next or user.rank_info.next == 0 %}
+                                        <small class="badge bg-warning text-dark mt-2 py-1 px-3 rounded-pill fw-bold">🚀 Đã đạt cấp độ tối đa!</small>
+                                    {% endif %}
+                                    <small class="text-muted d-block mt-2">Quyền lợi: Mượn tối đa <strong>{{ user.rank_info.max_books }} cuốn</strong></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 opacity-25">
+
+                    <div id="profile-view-mode">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center border-end">
+                                <img src="{{ user.avatar_url }}" class="rounded-circle img-thumbnail mb-3 shadow-sm" style="width: 160px; height: 160px; object-fit: cover;">
+                                <h5 class="fw-bold mb-1 text-dark">{{ user.get_full_name|default:user.username }}</h5>
+                                <span class="badge bg-light text-primary border border-primary px-3 rounded-pill">{{ user.role }}</span>
+                            </div>
+                            <div class="col-md-8 ps-md-5">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="text-muted small d-block mb-1 text-uppercase fw-bold">Mã sinh viên</label>
+                                        <p class="fs-5 text-dark fw-medium">{{ user.msv|default:"Chưa cập nhật" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small d-block mb-1 text-uppercase fw-bold">Lớp học</label>
+                                        <p class="fs-5 text-dark fw-medium">{{ user.lop|default:"Chưa cập nhật" }}</p>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="text-muted small d-block mb-1 text-uppercase fw-bold">Địa chỉ liên hệ</label>
+                                        <p class="fs-5 text-dark fw-medium">{{ user.dia_chi|default:"Chưa cập nhật" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-top">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="fw-bold m-0 text-primary">
+                                    <i class="fas fa-star text-warning me-2"></i>Sách bạn đã đánh giá
+                                </h5>
+                                {% if has_more_reviews %}
+                                <a href="{% url 'my_reviews' %}" class="btn btn-link text-decoration-none fw-bold p-0">
+                                    Xem tất cả <i class="fas fa-angle-right ms-1"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="row g-3">
+                                {% for review in user_reviews %}
+                                <div class="col-md-6 col-lg-4">
+                                    <a href="{% url 'book_detail' review.book.id %}" class="text-decoration-none">
+                                        <div class="card border-0 bg-light shadow-sm h-100 transition-hover" style="border-radius: 12px;">
+                                            <div class="card-body d-flex align-items-center p-3">
+                                                <img src="{{ review.book.get_cover }}" alt="{{ review.book.title }}" style="width: 50px; height: 75px; object-fit: cover;" class="rounded me-3 shadow-sm">
+                                                <div>
+                                                    <h6 class="text-dark fw-bold mb-1 text-truncate" style="max-width: 160px;" title="{{ review.book.title }}">{{ review.book.title }}</h6>
+                                                    <div class="text-warning small mb-1">
+                                                        {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                                                    </div>
+                                                    <small class="text-muted fst-italic">{{ review.created_at|date:"d/m/Y" }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-4">
+                                    <p class="text-muted small italic">Bạn chưa để lại đánh giá cho cuốn sách nào.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="profile-edit-mode" method="POST" enctype="multipart/form-data" class="row g-3 d-none">
+                        {% csrf_token %}
+                        <div class="col-md-4 text-center border-end">
+                            <div id="profile-drag-zone" class="position-relative d-inline-block rounded-circle drag-drop-zone">
+                                <img id="avatar-preview" src="{{ user.avatar_url }}" 
+                                     class="rounded-circle img-thumbnail shadow-sm" 
+                                     style="width: 160px; height: 160px; object-fit: cover;">
+                                <div class="position-absolute bottom-0 end-0">
+                                    <label for="avatar-upload" class="btn btn-primary btn-sm rounded-circle shadow" style="cursor: pointer;">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            <input type="file" id="avatar-upload" name="avatar" class="d-none" accept="image/*">
+                            <p class="text-muted small mt-2">Kéo thả ảnh vào đây để thay đổi</p>
+                        </div>
+
+                        <div class="col-md-8 ps-md-5">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase text-muted">Họ và tên đệm</label>
+                                    <input type="text" name="first_name" class="form-control rounded-3" value="{{ user.first_name|default:'' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase text-muted">Tên</label>
+                                    <input type="text" name="last_name" class="form-control rounded-3" value="{{ user.last_name|default:'' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase text-muted">Mã sinh viên (MSV)</label>
+                                    <input type="text" name="msv" class="form-control rounded-3" value="{{ user.msv|default:'' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-uppercase text-muted">Lớp học</label>
+                                    <input type="text" name="lop" class="form-control rounded-3" value="{{ user.lop|default:'' }}">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-uppercase text-muted">Địa chỉ</label>
+                                    <textarea name="dia_chi" class="form-control rounded-3" rows="3">{{ user.dia_chi|default:'' }}</textarea>
+                                </div>
+                            </div>
+                            <div class="mt-4 d-flex gap-2">
+                                <button type="submit" id="btn-save-profile" class="btn btn-primary px-5 rounded-pill fw-bold shadow-sm d-flex align-items-center">
+                                    <span class="btn-text">Lưu thay đổi</span>
+                                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                                </button>
+                                <button type="button" id="btn-cancel-edit" class="btn btn-light px-4 rounded-pill fw-bold">Hủy bỏ</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold mb-0">Chọn phương thức thanh toán</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">Số tiền phạt: <strong class="text-danger">{{ user.total_fine }} VNĐ</strong></p>
+                <form action="{% url 'pay_all_penalties' %}" method="POST"> 
+                    {% csrf_token %}
+                    <div class="d-grid gap-3">
+                        <label class="d-flex align-items-center p-3 border rounded-3 cursor-pointer hover-bg-light">
+                            <input type="radio" name="payment_method" value="COUNTER" checked class="form-check-input me-3" id="methodCounter">
+                            <div>
+                                <strong class="d-block">Thanh toán tại quầy</strong>
+                                <small class="text-muted italic">Liên hệ thủ thư để đóng tiền mặt</small>
+                            </div>
+                        </label>
+                        <label class="d-flex align-items-center p-3 border rounded-3 cursor-pointer hover-bg-light">
+                            <input type="radio" name="payment_method" value="TRANSFER" class="form-check-input me-3" id="methodTransfer">
+                            <div>
+                                <strong class="d-block">Chuyển khoản (VietQR)</strong>
+                                <small class="text-muted italic">Quét mã QR để xử lý nhanh</small>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="qr-section" class="d-none mt-4 p-3 bg-light rounded-3 text-center border border-primary border-opacity-25 animate__animated animate__fadeIn">
+                        <img src="{% static 'img/qr.png' %}" class="img-fluid rounded shadow-sm mb-2" style="max-width: 220px;">
+                        <p class="small text-muted mb-0">Nội dung: <strong>{{ user.username }} - Thanh toan</strong></p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill mt-4 fw-bold shadow-sm">Xác nhận thanh toán</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
