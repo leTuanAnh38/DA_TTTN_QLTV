@@ -1,0 +1,166 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Quản lý người đọc - Admin Alovu{% endblock %}
+
+{% block staff_title %}Quản lý Người dùng{% endblock %}
+{% block nav_staff_user %}active{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold text-dark m-0">Danh sách người đọc</h3>
+            <div class="d-flex align-items-center gap-3 mt-1">
+                <p class="text-muted small m-0">Quản lý thông tin, điểm tích lũy và tình trạng nợ phạt của sinh viên.
+                </p>
+                <div class="vr text-muted opacity-25" style="height: 12px;"></div>
+                <span class="badge bg-primary rounded-pill px-3 py-1 shadow-sm"><i class="fas fa-users me-1"></i> Tổng:
+                    {{ total_readers }}</span>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+            <div class="bg-white rounded-pill shadow-sm p-1 border">
+                <form method="GET" action="{% url 'staff_user_management' %}" class="d-flex align-items-center m-0">
+                    <i class="fas fa-search text-muted ms-3"></i>
+                    <input type="text" name="search_query"
+                        class="form-control border-0 shadow-none bg-transparent px-3 py-1"
+                        style="width: 250px; font-size: 0.9rem;" placeholder="Tìm tên, MSSV, Email..."
+                        value="{{ request.GET.search_query|default:'' }}">
+                    {% if request.GET.search_query %}
+                    <a href="{% url 'staff_user_management' %}"
+                        class="btn btn-sm btn-light text-muted me-1 rounded-circle" title="Xóa tìm kiếm">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                    <button class="btn btn-dark btn-sm px-4 rounded-pill fw-medium me-1" type="submit">Tìm kiếm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-4 shadow-sm border overflow-hidden mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-0 py-3 ps-4 text-muted small text-uppercase fw-bold">Thành viên</th>
+                        <th class="border-0 py-3 text-muted small text-uppercase fw-bold">MSSV / Lớp</th>
+                        <th class="border-0 py-3 text-center text-muted small text-uppercase fw-bold">Điểm tích lũy</th>
+                        <th class="border-0 py-3 text-center text-muted small text-uppercase fw-bold">Tình trạng nợ</th>
+                        <th class="border-0 py-3 text-end pe-4 text-muted small text-uppercase fw-bold">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for reader in readers %}
+                    <tr class="animate__animated animate__fadeIn">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center me-3 border border-primary border-2 shadow-sm bg-white overflow-hidden"
+                                    style="width: 42px; height: 42px; min-width: 42px;">
+                                    {% if reader.avatar and 'default.png' not in reader.avatar.name %}
+                                    <img src="{{ reader.avatar_url }}" class="w-100 h-100 object-fit-cover"
+                                        alt="Avatar">
+                                    {% else %}
+                                        <span class="fw-bold text-primary">{{ reader.username|first|upper }}</span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">{{ reader.get_full_name|default:reader.username }}</div>
+                                    <small class="text-muted d-block" style="font-size: 0.8rem;">{{ reader.email|default:"Chưa cập nhật email" }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="text-dark fw-medium" style="font-size: 0.9rem;">{{ reader.msv|default:"-" }}
+                            </div>
+                            <small class="text-muted">Lớp: {{ reader.lop|default:"-" }}</small>
+                        </td>
+
+                        <td class="text-center">
+                            <div
+                                class="d-inline-flex align-items-center px-3 py-1 rounded-pill bg-light border shadow-none">
+                                <i class="fas fa-star text-warning me-2" style="font-size: 0.75rem;"></i>
+                                <span class="fw-bold text-dark small">{{ reader.points }}</span>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            {% if reader.total_fine > 0 %}
+                            <span
+                                class="badge bg-white border border-danger text-danger rounded-pill px-3 fw-bold shadow-sm">
+                                <i class="fas fa-exclamation-circle me-1"></i>{{ reader.total_fine|floatformat:0 }} VNĐ
+                            </span>
+                            {% else %}
+                            <span class="text-success small fw-medium">
+                                <i class="fas fa-check-circle me-1"></i>Hoàn tất phí
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <a href="{% url 'staff_user_detail' reader.id %}"
+                                class="btn btn-sm btn-light border rounded-pill px-3 fw-medium text-dark shadow-none transition-hover">
+                                Hồ sơ chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="fas fa-users-slash fa-3x mb-3 opacity-25"></i>
+                            <p class="fw-medium">Không tìm thấy người đọc nào phù hợp.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if readers.has_other_pages %}
+        <div class="card-footer bg-white border-top p-4 d-flex justify-content-center">
+            <nav>
+                <ul class="pagination pagination-sm mb-0 gap-2">
+                    {% if readers.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle border-0 shadow-sm bg-light text-dark px-3 py-2"
+                            href="?search_query={{ request.GET.search_query|default:'' }}&page={{ readers.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in readers.paginator.page_range %}
+                    {% if readers.number == num %}
+                    <li class="page-item active">
+                        <span
+                            class="page-link rounded-circle border-0 shadow-sm bg-primary px-3 py-2 fw-bold text-white">{{
+                            num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle border-0 shadow-sm bg-light text-dark px-3 py-2"
+                            href="?search_query={{ request.GET.search_query|default:'' }}&page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if readers.has_next %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle border-0 shadow-sm bg-light text-dark px-3 py-2"
+                            href="?search_query={{ request.GET.search_query|default:'' }}&page={{ readers.next_page_number }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
