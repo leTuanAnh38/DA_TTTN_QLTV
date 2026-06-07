@@ -1,0 +1,119 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Quản lý Alovu{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            
+            <div class="mb-4">
+                <a href="{% url 'staff_event_list' %}" class="text-decoration-none text-muted fw-medium hover-primary transition-hover d-inline-block">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                
+                <div class="card-header bg-white border-bottom p-4 d-flex align-items-center">
+                    <i class="far fa-calendar-alt text-primary fs-2 me-3"></i>
+                    <h4 class="fw-bold text-dark mb-0">{{ title }}</h4>
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form method="POST" enctype="multipart/form-data" id="eventForm">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Tên sự kiện <span class="text-danger">*</span></label>
+                            {{ form.title }}
+                        </div>
+
+                        <div class="mb-4 bg-light p-4 rounded-4 border border-dashed" id="drag-drop-area">
+                            <label class="form-label fw-bold text-dark mb-3">Ảnh bìa sự kiện</label>
+                            <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+                                <div class="flex-shrink-0 text-center">
+                                    <div class="border border-2 border-white rounded-3 overflow-hidden shadow-sm bg-white d-flex align-items-center justify-content-center" 
+                                         style="width: 240px; height: 140px; position: relative;">
+                                        {% if form.instance.cover_image %}
+                                            <img src="{{ form.instance.cover_image.url }}" id="avatar-preview" class="w-100 h-100" style="object-fit: cover;">
+                                        {% else %}
+                                            <img src="https://placehold.co/600x350?text=Chua+Co+Anh" id="avatar-preview" class="w-100 h-100" style="object-fit: cover;">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    {{ form.cover_image }}
+                                    <div class="form-text mt-2 text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>Định dạng JPG, PNG. Kéo thả file vào khung xám này hoặc bấm chọn.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                {{ form.start_date }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-dark">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                {{ form.end_date }}
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold text-dark">Địa điểm tổ chức <span class="text-danger">*</span></label>
+                                <div class="input-group shadow-none">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-map-marker-alt text-danger"></i></span>
+                                    {{ form.location }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold text-dark">Giới hạn tham gia</label>
+                                <div class="input-group shadow-none">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-users text-primary"></i></span>
+                                    {{ form.max_participants }}
+                                </div>
+                                <div class="form-text mt-1 text-muted small">Điền <strong>0</strong> nếu không giới hạn</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Nội dung chi tiết <span class="text-danger">*</span></label>
+                            {{ form.content }}
+                        </div>
+
+                        <div class="mb-4 bg-light p-3 rounded-3 border">
+                            <div class="form-check form-switch d-flex align-items-center mb-0">
+                                {{ form.is_active }}
+                                <label class="form-check-label fw-bold text-dark ms-3 mt-1" for="{{ form.is_active.id_for_label }}" style="cursor: pointer;">
+                                    Đang mở đăng ký (Cho phép sinh viên bấm tham gia)
+                                </label>
+                            </div>
+                        </div>
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger rounded-3 border-danger border-opacity-50 d-flex align-items-center">
+                                <i class="fas fa-exclamation-triangle fs-4 me-3 text-danger"></i>
+                                <div><strong>Khoan đã!</strong> Vui lòng kiểm tra lại các thông tin màu đỏ bên trên.</div>
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-5 d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm transition-hover">
+                                <i class="fas fa-save me-2"></i> LƯU SỰ KIỆN
+                            </button>
+                            <a href="{% url 'staff_event_list' %}" class="btn btn-light px-5 py-2 rounded-pill border fw-bold text-dark transition-hover">
+                                Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
