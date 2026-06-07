@@ -1,0 +1,224 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Quản lý Sự kiện - Admin Alovu{% endblock %}
+
+{% block staff_title %}Quản lý Sự kiện{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold m-0 text-dark">Quản lý Sự kiện</h3>
+            <p class="text-muted small m-0 mt-1">Tổng cộng <strong>{{ events.paginator.count }}</strong> sự kiện trong hệ thống.</p>
+        </div>
+        
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+            <div class="bg-white rounded-pill shadow-sm p-1 border">
+                <form method="GET" action="{% url 'staff_event_list' %}" class="d-flex align-items-center m-0">
+                    <i class="fas fa-search text-muted ms-3"></i>
+                    <input type="text" name="search_query" class="form-control border-0 shadow-none bg-transparent px-3 py-1" 
+                           style="width: 250px; font-size: 0.9rem;"
+                           placeholder="Tìm tên sự kiện, địa điểm..." 
+                           value="{{ query|default:'' }}">
+                    {% if query %}
+                        <a href="{% url 'staff_event_list' %}" class="btn btn-sm btn-light text-muted me-1 rounded-circle" title="Xóa tìm kiếm">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-dark btn-sm px-4 rounded-pill fw-medium me-1" type="submit">Tìm kiếm</button>
+                </form>
+            </div>
+            <a href="{% url 'event_create' %}" class="btn btn-primary rounded-pill py-2 px-4 fw-bold shadow-sm text-nowrap">
+                <i class="fas fa-plus-circle me-2"></i>Thêm Mới
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-borderless table-hover align-middle mb-0">
+                <thead class="border-bottom bg-light">
+                    <tr>
+                        <th class="text-muted fw-semibold small text-uppercase py-3 ps-4">Thông tin sự kiện</th>
+                        <th class="text-muted fw-semibold small text-uppercase py-3">Thời gian & Địa điểm</th>
+                        <th class="text-muted fw-semibold small text-uppercase py-3 text-center">Người tham gia</th>
+                        <th class="text-muted fw-semibold small text-uppercase py-3 text-center">Trạng thái</th>
+                        <th class="text-muted fw-semibold small text-uppercase py-3 text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr class="border-bottom transition-hover-row animate__animated animate__fadeIn {% if event.end_date < now %}opacity-75 bg-light{% endif %}">
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ event.get_cover }}" class="rounded border shadow-sm me-3" style="width: 60px; height: 60px; object-fit: cover; {% if event.end_date < now %}filter: grayscale(1);{% endif %}">
+                                <div>
+                                    <div class="fw-bold text-dark text-truncate" style="max-width: 200px; font-size: 0.95rem;" title="{{ event.title }}">{{ event.title }}</div>
+                                    <div class="text-muted small mt-1"><i class="far fa-clock me-1"></i>Tạo lúc: {{ event.created_at|date:"d/m/Y" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-dark small mb-1">
+                                <i class="far fa-calendar-alt text-primary me-2"></i>
+                                Bắt đầu: {{ event.start_date|date:"d/m/Y - H:i" }}
+                            </div>
+                            <div class="fw-semibold text-dark small mb-1">
+                                <i class="far fa-calendar-check text-success me-2"></i>
+                                Kết thúc: {{ event.end_date|date:"d/m/Y - H:i" }}
+                            </div>
+                            <div class="text-muted small"><i class="fas fa-map-marker-alt text-danger me-2"></i>{{ event.location }}</div>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="badge bg-light text-dark border px-3 py-2 rounded-pill fs-6 shadow-sm cursor-pointer hover-scale" 
+                                    data-bs-toggle="modal" data-bs-target="#participantsModal{{ event.id }}"
+                                    style="cursor: pointer; transition: all 0.2s; border: 1px solid #dee2e6 !important;">
+                                {{ event.registered_count }} / {% if event.max_participants > 0 %}{{ event.max_participants }}{% else %}&infin;{% endif %}
+                            </button>
+                        </td>
+                        <td class="text-center">
+                            {% if event.end_date < now %}
+                                <span class="badge bg-white border border-danger text-danger px-3 py-1 rounded-pill">Đã kết thúc</span>
+                            {% elif event.is_active %}
+                                <span class="badge bg-white border border-success text-success px-3 py-1 rounded-pill">Đang mở</span>
+                            {% else %}
+                                <span class="badge bg-white border border-secondary text-secondary px-3 py-1 rounded-pill">Đã đóng</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'event_edit' event.id %}" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; line-height: 30px;" title="Sửa">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a href="{% url 'event_delete' event.id %}" class="btn btn-sm btn-outline-danger rounded-circle custom-confirm" style="width: 32px; height: 32px; padding: 0; line-height: 30px;" data-message="Chắc chắn muốn xóa sự kiện [{{ event.title }}]?" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-bullhorn fa-3x text-muted opacity-25 mb-3"></i>
+                            <p class="text-muted mb-0 fw-medium">Chưa có sự kiện nào.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if events.has_other_pages %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm shadow-sm bg-white rounded-3 overflow-hidden border m-0">
+                {% if events.has_previous %}
+                    <li class="page-item"><a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?search_query={{ query }}&page={{ events.previous_page_number }}">Trước</a></li>
+                {% endif %}
+                {% for num in events.paginator.page_range %}
+                    {% if events.number == num %}
+                        <li class="page-item active"><span class="page-link bg-dark text-white border-0 fw-bold px-3 py-2">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?search_query={{ query }}&page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if events.has_next %}
+                    <li class="page-item"><a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?search_query={{ query }}&page={{ events.next_page_number }}">Sau</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Participants Modals Moved Here to Avoid Backdrop Issue -->
+{% for event in events %}
+<div class="modal fade" id="participantsModal{{ event.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+            <div class="modal-header border-0 bg-white p-4 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fas fa-users-cog me-2 text-primary"></i>Quản lý Đăng ký
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Event Header Info (Lightened Background) -->
+                <div class="mx-4 my-3 p-4 rounded-4 text-white d-flex justify-content-between align-items-center shadow-sm" 
+                     style="background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-white">{{ event.title }}</h5>
+                        <div class="small opacity-75 d-flex align-items-center">
+                            <i class="fas fa-map-marker-alt me-2 text-warning"></i>{{ event.location }}
+                            <span class="mx-2 opacity-50">|</span>
+                            <i class="far fa-calendar-check me-2"></i>{{ event.start_date|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="h4 fw-bold mb-0 text-warning">{{ event.registered_count }}</div>
+                        <div class="small opacity-75">Tham gia</div>
+                    </div>
+                </div>
+                
+                <div class="px-4 pb-4">
+                    <div class="table-responsive rounded-3 border">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 py-3 small text-uppercase text-muted fw-bold border-0" style="width: 50%;">Thông tin Sinh viên</th>
+                                    <th class="py-3 small text-uppercase text-muted fw-bold border-0">Mã sinh viên</th>
+                                    <th class="pe-4 py-3 small text-uppercase text-muted fw-bold text-end border-0">Ngày đăng ký</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in event.eventregistration_set.all %}
+                                <tr>
+                                    <td class="ps-4 py-3 border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm bg-primary bg-opacity-10" 
+                                                 style="width: 40px; height: 40px; border: 1px solid rgba(13, 110, 253, 0.1);">
+                                                {% if reg.user.avatar %}
+                                                    <img src="{{ reg.user.avatar.url }}" class="rounded-circle object-fit-cover w-100 h-100">
+                                                {% else %}
+                                                    <span class="fw-bold text-primary small">{{ reg.user.username|slice:":1"|upper }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">{{ reg.user.get_full_name|default:reg.user.username }}</div>
+                                                <div class="text-muted small text-break" style="max-width: 250px;">{{ reg.user.email|default:"Chưa có email" }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="border-0">
+                                        <span class="badge bg-light text-dark border px-2 py-1 fw-medium font-monospace">{{ reg.user.msv|default:"-" }}</span>
+                                    </td>
+                                    <td class="pe-4 text-end border-0">
+                                        <div class="fw-semibold text-dark small">{{ reg.registered_at|date:"d/m/Y" }}</div>
+                                        <div class="text-muted" style="font-size: 0.7rem;">{{ reg.registered_at|date:"H:i" }}</div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5">
+                                        <div class="opacity-25">
+                                            <i class="fas fa-user-slash fa-3x mb-3"></i>
+                                        </div>
+                                        <p class="text-muted mb-0">Hiện chưa có sinh viên nào đăng ký tham gia sự kiện này.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top bg-light p-3 px-4">
+                <button type="button" class="btn btn-dark rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Đóng cửa sổ</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
