@@ -12,10 +12,10 @@
         </div>
         {% endif %}
 
-        <div class="text-center bg-light" style="height: 260px; overflow: hidden;">
-            <a href="{% url 'book_detail' book.id %}" class="d-block h-100">
+        <div class="text-center bg-white d-flex align-items-center justify-content-center" style="height: 260px; overflow: hidden; padding: 15px;">
+            <a href="{% url 'book_detail' book.id %}" class="d-block h-100 w-100">
                 <img src="{{ book.get_cover }}" class="h-100 w-100 transition-zoom"
-                    style="object-fit: cover; object-position: top;" alt="{{ book.title }}">
+                    style="object-fit: contain; object-position: center;" alt="{{ book.title }}">
             </a>
         </div>
 
