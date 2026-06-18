@@ -37,8 +37,8 @@ Làm theo các bước sau để chạy dự án trên máy cá nhân của bạ
 
 **Bước 1: Clone kho lưu trữ về máy**
 ```bash
-git clone [https://github.com//leTuanAnh38/library-management-system.git](https://github.com//leTuanAnh38/library-management-system.git)
-cd library-management-system
+git clone [https://github.com/leTuanAnh38/DA_TTTN_QLTV.git](https://github.com/leTuanAnh38/DA_TTTN_QLTV.git)
+cd DA_TTTN_QLTV
 ```
 
 **Bước 2: Tạo môi trường ảo (Virtual Environment) và kích hoạt**
