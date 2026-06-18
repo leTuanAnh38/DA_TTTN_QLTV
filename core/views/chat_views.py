@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
 from core.models import ChatMessage
-from core.chatbox import GeminiChatService
+from core.chatbox import AdvancedGeminiChatService
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +30,9 @@ def chat_message_api(request):
             role='USER'
         )
         
-        # Gọi Gemini Service - TỰ ĐỘNG XỬ LÝ BORROW INTENT BÊN TRONG
-        service = GeminiChatService()
-        logger.debug(f"[CHAT API] Calling GeminiChatService...")
+        # Gọi Advanced Gemini Service - TỰ ĐỘNG XỬ LÝ BORROW INTENT BÊN TRONG
+        service = AdvancedGeminiChatService()
+        logger.debug(f"[CHAT API] Calling AdvancedGeminiChatService...")
         bot_response = service.chat(user_message, request.user, request=request)
         
         # Lưu phản hồi của bot
