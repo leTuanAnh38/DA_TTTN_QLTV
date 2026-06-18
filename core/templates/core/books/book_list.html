@@ -18,15 +18,16 @@
 
         <div class="col-lg-9">
             <div class="bg-white p-4 rounded-3 shadow-sm border mb-4">
-                <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bold text-primary">
+                <div class="text-center mb-5 pb-3">
+                    <h1 class="display-5 fw-bold text-dark mb-3">
                         {% if category_obj %}
                             Danh mục: {{ category_obj.name }}
                         {% else %}
                             Toàn Bộ Kho Sách
                         {% endif %}
                     </h1>
-                    <div class="mx-auto bg-primary" style="width: 100px; height: 3px;"></div>
+                    <div class="mx-auto bg-primary mb-4" style="width: 80px; height: 4px; border-radius: 2px;"></div>
+                    <p class="text-muted fs-6">Khám phá kho tài liệu và tác phẩm đa dạng, phong phú của thư viện.</p>
                 </div>
                 
                 <form method="GET" action="{% url 'book_list' %}" class="row g-3 mb-4">

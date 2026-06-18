@@ -150,6 +150,7 @@ def delete_book(request, book_id):
     query_string = urlencode({'page': current_page})
     url = f"{base_url}?{query_string}"
     return redirect(url)
+
 # --- QUẢN LÝ DANH MỤC ---
 @user_passes_test(is_staff, login_url='login')
 def staff_category_list(request):

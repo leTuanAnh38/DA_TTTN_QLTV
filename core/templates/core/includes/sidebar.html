@@ -41,6 +41,10 @@
             <span class="badge bg-danger rounded-pill float-end">{{ wishlist_count }}</span>
         {% endif %}
     </a>
+
+    <a href="{% url 'my_reviews' %}" class="list-group-item list-group-item-action py-3 border-0 {% if request.resolver_match.url_name == 'my_reviews' %}active bg-light text-primary fw-bold{% endif %}">
+        <i class="fas fa-star text-warning me-3 fa-fw"></i>Đánh giá của tôi
+    </a>
 </div>
 
 <style>

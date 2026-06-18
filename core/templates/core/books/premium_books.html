@@ -18,17 +18,17 @@
         <div class="col-lg-9">
             <div class="bg-white p-4 rounded-3 shadow-sm border mb-4">
                 
-                <div class="text-center mb-5">
-                    <h1 class="display-5 fw-bold text-warning">
-                        <i class="fas fa-crown me-2"></i> 
+                <div class="text-center mb-5 pb-3">
+                    <h1 class="display-5 fw-bold text-dark mb-3">
+                        <i class="fas fa-crown me-2 text-warning"></i> 
                         {% if category_obj %}
                             Sách VIP: {{ category_obj.name }}
                         {% else %}
-                            Kho Sách phiên bản giới hạn
+                            Kho Sách Phiên Bản Giới Hạn
                         {% endif %}
                     </h1>
-                    <div class="mx-auto bg-warning" style="width: 100px; height: 3px;"></div>
-                    <p class="text-muted mt-3">Bộ sưu tập các tài liệu chuyên ngành cao cấp. Yêu cầu thanh toán phí mượn để sử dụng.</p>
+                    <div class="mx-auto bg-primary mb-4" style="width: 80px; height: 4px; border-radius: 2px;"></div>
+                    <p class="text-muted fs-6">Bộ sưu tập các tài liệu chuyên ngành cao cấp. Yêu cầu thanh toán phí mượn để sử dụng.</p>
                 </div>
 
                 <form method="GET" action="{% url 'premium_books' %}" class="row g-3 mb-4">

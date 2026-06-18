@@ -55,11 +55,18 @@ def chat_message_api(request):
 
 @login_required
 def get_chat_history(request):
-    """Lấy lịch sử chat"""
-    messages = ChatMessage.objects.filter(user=request.user).values('role', 'message', 'created_at')[:20]
+    """Lấy lịch sử chat (25 tin nhắn mới nhất)"""
+    messages = ChatMessage.objects.filter(user=request.user).order_by('-created_at')[:25]
+    messages_list = []
+    for msg in reversed(messages):
+        messages_list.append({
+            'role': msg.role.lower(),
+            'message': msg.message,
+            'created_at': msg.created_at
+        })
     return JsonResponse({
         'status': 'success',
-        'messages': list(messages)
+        'messages': messages_list
     })
 
 @login_required

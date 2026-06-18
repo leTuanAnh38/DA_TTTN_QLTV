@@ -103,8 +103,7 @@
                                         <img src="{{ book.get_cover }}" class="img-fluid"
                                             style="height: 120px; object-fit: contain; width: 100%;">
                                     </a>
-                                    <h6 class="small fw-bold text-dark text-truncate mb-2" title="{{ book.title }}">{{
-                                        book.title }}</h6>
+                                    <h6 class="small fw-bold text-dark text-truncate mb-2" title="{{ book.title }}">{{ book.title }}</h6>
                                     <div class="mt-auto">
                                         <span class="badge bg-warning text-dark px-2 py-1 small rounded-pill">
                                             <i class="fas fa-fire text-danger me-1"></i>{{ book.borrow_count }} lượt
@@ -139,13 +138,11 @@
                                         <img src="{{ book.get_cover }}" class="img-fluid"
                                             style="height: 120px; object-fit: contain; width: 100%;">
                                     </a>
-                                    <h6 class="small fw-bold text-dark text-truncate mb-2" title="{{ book.title }}">{{
-                                        book.title }}</h6>
+                                    <h6 class="small fw-bold text-dark text-truncate mb-2" title="{{ book.title }}">{{ book.title }}</h6>
                                     <div class="mt-auto">
                                         <span
                                             class="text-warning small fw-bold d-inline-flex align-items-center bg-light px-2 py-1 rounded-pill border">
-                                            <i class="fas fa-star me-1 text-warning"></i>{{
-                                            book.avg_rating|floatformat:1 }}
+                                            <i class="fas fa-star me-1 text-warning"></i>{{ book.avg_rating|floatformat:1 }}
                                         </span>
                                     </div>
                                 </div>

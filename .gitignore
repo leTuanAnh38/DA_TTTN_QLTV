@@ -22,7 +22,3 @@ media/
 *.pyc
 *.pyo
 media/
-.venv/
-venv/
-venv.bak/
-env/

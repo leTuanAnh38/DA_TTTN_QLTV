@@ -8,6 +8,7 @@
 
 <div class="container-fluid px-lg-5 py-4">
     <div class="row g-4">
+        <!-- Sidebar -->
         <div class="col-lg-3">
              <div class="sticky-sidebar">
                 <div class="card border shadow-sm rounded-4 overflow-hidden mb-0">
@@ -16,50 +17,67 @@
             </div>
         </div>
 
+        <!-- Main Content -->
         <div class="col-lg-9">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4 border-start border-4 border-primary ps-3">
-                        <div>
-                            <h4 class="fw-bold m-0 text-dark">
-                                <i class="fas fa-star text-warning me-2"></i>Tất cả đánh giá của bạn
-                            </h4>
-                            <p class="text-muted small m-0 mt-1">Danh sách những cuốn sách bạn đã từng nhận xét.</p>
-                        </div>
-                        <a href="{% url 'profile' %}" class="btn btn-light btn-sm rounded-pill px-3 fw-bold">
-                            <i class="fas fa-arrow-left me-2"></i>Quay lại hồ sơ
-                        </a>
+            <!-- Back button line -->
+          
+            <div class="card border border-light-subtle shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <!-- Synchronized Page Title Block -->
+                    <div class="text-center mb-5 pb-3 animate__animated animate__fadeInDown">
+                        <h1 class="display-5 fw-bold text-dark mb-3">
+                            <i class="fas fa-star text-warning me-2 animate-bounce"></i>Đánh Giá Của Bạn
+                        </h1>
+                        <div class="mx-auto bg-primary mb-4" style="width: 80px; height: 4px; border-radius: 2px;"></div>
+                        <p class="text-muted fs-6 mx-auto" style="max-width: 650px; line-height: 1.6;">
+                            Danh sách tất cả các đánh giá và cảm nghĩ bạn đã chia sẻ về các cuốn sách trong thư viện của chúng tôi.
+                        </p>
                     </div>
 
+                    <!-- Reviews List Grid -->
                     <div class="row g-4">
                         {% for review in reviews %}
-                        <div class="col-md-6">
-                            <div class="card border shadow-sm h-100 rounded-4 overflow-hidden transition-hover bg-white">
-                                <div class="card-body p-3">
-                                    <div class="d-flex align-items-start">
-                                        <a href="{% url 'book_detail' review.book.id %}">
-                                            <img src="{{ review.book.get_cover }}" class="rounded shadow-sm border me-3" 
-                                                 style="width: 80px; height: 120px; object-fit: cover;">
-                                        </a>
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                                <h6 class="fw-bold text-dark mb-0">
-                                                    <a href="{% url 'book_detail' review.book.id %}" class="text-decoration-none text-dark hover-primary">
-                                                        {{ review.book.title }}
-                                                    </a>
-                                                </h6>
-                                                <span class="badge bg-light text-warning border border-warning-subtle rounded-pill">
-                                                    {{ review.rating }} <i class="fas fa-star ms-1"></i>
-                                                </span>
+                        <div class="col-md-6 animate__animated animate__fadeInUp">
+                            <div class="card border border-light-subtle shadow-sm h-100 rounded-4 overflow-hidden transition-hover bg-white p-3">
+                                <div class="d-flex align-items-start">
+                                    <!-- Book Cover Wrapper with contrast background to prevent blending -->
+                                    <a href="{% url 'book_detail' review.book.id %}" class="text-decoration-none">
+                                        <div class="border rounded-3 p-1 d-flex align-items-center justify-content-center shadow-sm transition-hover" style="width: 80px; height: 120px; min-width: 80px; overflow: hidden; background-color: #f1f5f9 !important;">
+                                            <img src="{{ review.book.get_cover }}" class="h-100 w-100" style="object-fit: contain;" alt="{{ review.book.title }}">
+                                        </div>
+                                    </a>
+                                    
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                            <h6 class="fw-bold text-dark mb-0">
+                                                <a href="{% url 'book_detail' review.book.id %}" class="text-decoration-none text-dark hover-primary" style="font-size: 0.95rem; line-height: 1.4;">
+                                                    {{ review.book.title }}
+                                                </a>
+                                            </h6>
+                                            <!-- Dynamic Star Rating Badge -->
+                                            <div class="text-warning small text-nowrap">
+                                                {% if review.rating == 5 %}
+                                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                                {% elif review.rating == 4 %}
+                                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star text-muted opacity-50"></i>
+                                                {% elif review.rating == 3 %}
+                                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star text-muted opacity-50"></i><i class="far fa-star text-muted opacity-50"></i>
+                                                {% elif review.rating == 2 %}
+                                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star text-muted opacity-50"></i><i class="far fa-star text-muted opacity-50"></i><i class="far fa-star text-muted opacity-50"></i>
+                                                {% else %}
+                                                    <i class="fas fa-star"></i><i class="far fa-star text-muted opacity-50"></i><i class="far fa-star text-muted opacity-50"></i><i class="far fa-star text-muted opacity-50"></i><i class="far fa-star text-muted opacity-50"></i>
+                                                {% endif %}
                                             </div>
-                                            <p class="text-muted small mb-2 italic">Đã đánh giá ngày: {{ review.created_at|date:"d/m/Y - H:i" }}</p>
-                                            
-                                            <div class="bg-light p-3 rounded-3 position-relative mt-2">
-                                                <i class="fas fa-quote-left text-primary opacity-25 position-absolute" style="top: 10px; left: 10px; font-size: 0.8rem;"></i>
-                                                <p class="text-dark small mb-0 px-2" style="line-height: 1.5; min-height: 40px;">
-                                                    {{ review.comment|default:"Không có nội dung nhận xét." }}
-                                                </p>
-                                            </div>
+                                        </div>
+                                        <p class="text-muted small mb-2"><i class="far fa-clock me-1"></i>Đánh giá ngày: {{ review.created_at|date:"d/m/Y - H:i" }}</p>
+                                        
+                                        <!-- Premium Blockquote box -->
+                                        <div class="p-3 rounded-4 mt-2 position-relative" style="background-color: #f8fafc; border-left: 3px solid var(--bs-primary);">
+                                            <i class="fas fa-quote-left text-primary opacity-25 position-absolute" style="top: 8px; left: 8px; font-size: 0.7rem;"></i>
+                                            <p class="text-secondary small mb-0 px-2 italic" style="line-height: 1.5; min-height: 38px;">
+                                                {{ review.comment|default:"Không có nội dung nhận xét." }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -67,17 +85,23 @@
                         </div>
                         {% empty %}
                         <div class="col-12 text-center py-5">
-                            <i class="far fa-comment-dots fa-3x text-muted opacity-25 mb-3"></i>
-                            <p class="text-muted fw-medium">Bạn chưa có bài đánh giá nào cả.</p>
-                            <a href="{% url 'book_list' %}" class="btn btn-primary rounded-pill px-4 mt-2 shadow-sm">Khám phá sách ngay</a>
+                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 100px; height: 100px; background-color: rgba(255, 193, 7, 0.05) !important;">
+                                <i class="far fa-comment-dots fa-3x text-warning opacity-75"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Chưa có đánh giá nào</h5>
+                            <p class="text-muted mb-4">Bạn chưa chia sẻ cảm nhận về cuốn sách nào cả.</p>
+                            <a href="{% url 'book_list' %}" class="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-sm transition-hover">
+                                Khám phá sách ngay <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
                         </div>
                         {% endfor %}
                     </div>
 
+                    <!-- Modern Pagination -->
                     {% if reviews.has_other_pages %}
                     <div class="d-flex justify-content-center mt-5">
                         <nav aria-label="Page navigation">
-                            <ul class="pagination pagination-sm shadow-sm bg-white rounded-3 overflow-hidden border m-0">
+                            <ul class="pagination pagination-sm shadow-sm bg-white rounded-pill overflow-hidden border m-0">
                                 {% if reviews.has_previous %}
                                     <li class="page-item">
                                         <a class="page-link text-dark border-0 px-3 py-2 fw-medium" href="?page={{ reviews.previous_page_number }}">
@@ -89,7 +113,7 @@
                                 {% for num in reviews.paginator.page_range %}
                                     {% if reviews.number == num %}
                                         <li class="page-item active" aria-current="page">
-                                            <span class="page-link bg-primary text-white border-0 fw-bold px-3 py-2">{{ num }}</span>
+                                            <span class="page-link bg-primary text-white border-0 fw-bold px-3 py-2" style="background: linear-gradient(135deg, #ff9800, #f57c00) !important;">{{ num }}</span>
                                         </li>
                                     {% else %}
                                         <li class="page-item">
